@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>ShopBrain - AI Customer Service</title>
+  <title>Create AI Agent - ShopBrain</title>
 
   <style>
     * {
@@ -15,203 +15,338 @@
 
     body {
       font-family: Arial, sans-serif;
-      background: #f7f8fc;
+      background: #f5f7fb;
       color: #111827;
     }
 
     header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 20px 7%;
       background: white;
+      padding: 20px 7%;
       border-bottom: 1px solid #e5e7eb;
     }
 
     .logo {
       font-size: 24px;
-      font-weight: 800;
+      font-weight: bold;
     }
 
     .logo span {
       color: #2563eb;
     }
 
-    nav a {
-      margin-left: 25px;
-      text-decoration: none;
-      color: #374151;
+    .container {
+      max-width: 850px;
+      margin: 40px auto;
+      padding: 0 20px;
     }
 
-    .hero {
-      text-align: center;
-      padding: 100px 20px;
+    .intro {
+      margin-bottom: 25px;
     }
 
-    .hero h1 {
-      font-size: 52px;
-      max-width: 800px;
-      margin: auto;
-      line-height: 1.1;
+    .intro h1 {
+      font-size: 32px;
+      margin-bottom: 10px;
     }
 
-    .hero h1 span {
-      color: #2563eb;
-    }
-
-    .hero p {
-      max-width: 600px;
-      margin: 25px auto;
-      font-size: 18px;
+    .intro p {
       color: #6b7280;
-      line-height: 1.6;
+    }
+
+    .form-card {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .section h2 {
+      font-size: 19px;
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      margin-bottom: 18px;
+      font-size: 15px;
+      font-family: inherit;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #2563eb;
     }
 
     .button {
-      display: inline-block;
+      width: 100%;
+      padding: 15px;
       background: #2563eb;
       color: white;
-      padding: 15px 28px;
-      border-radius: 10px;
-      text-decoration: none;
+      border: none;
+      border-radius: 9px;
+      font-size: 16px;
       font-weight: bold;
+      cursor: pointer;
     }
 
-    .features {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      padding: 40px 7% 100px;
-      flex-wrap: wrap;
+    .button:hover {
+      background: #1d4ed8;
     }
 
-    .card {
-      background: white;
-      padding: 30px;
-      border-radius: 16px;
-      width: 280px;
-      box-shadow: 0 5px 25px rgba(0,0,0,0.05);
+    .success {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      background: #dcfce7;
+      color: #166534;
+      border-radius: 8px;
     }
 
-    .card h3 {
-      margin-bottom: 12px;
-    }
-
-    .card p {
-      color: #6b7280;
-      line-height: 1.5;
-    }
-
-    footer {
+    .continue {
+      display: none;
+      margin-top: 15px;
+      width: 100%;
+      padding: 15px;
+      background: #111827;
+      color: white;
+      border-radius: 9px;
+      text-decoration: none;
       text-align: center;
-      padding: 30px;
-      background: white;
-      color: #6b7280;
-    }
-
-    @media (max-width: 600px) {
-      header {
-        padding: 18px 5%;
-      }
-
-      nav a {
-        margin-left: 10px;
-        font-size: 14px;
-      }
-
-      .hero {
-        padding: 70px 20px;
-      }
-
-      .hero h1 {
-        font-size: 38px;
-      }
+      font-weight: bold;
     }
   </style>
 </head>
 
 <body>
 
-  <header>
+<header>
+  <div class="logo">
+    Shop<span>Brain</span>
+  </div>
+</header>
 
-    <div class="logo">
-      Shop<span>Brain</span>
-    </div>
+<div class="container">
 
-    <nav>
-      <a href="#features">Features</a>
-      <a href="#pricing">Pricing</a>
-      <a href="dashboard.html">Login</a>
-    </nav>
-
-  </header>
-
-
-  <section class="hero">
-
-    <h1>
-      Your Business's
-      <span>AI Customer Service</span>
-    </h1>
+  <div class="intro">
+    <h1>Create your AI Agent</h1>
 
     <p>
-      ShopBrain helps businesses create an AI customer-service
-      agent trained on their products, FAQs, policies and
-      business information.
+      Give ShopBrain the information it needs to provide
+      accurate customer service.
     </p>
+  </div>
 
-    <a href="agent.html" class="button">
-      Create Your AI Agent
-    </a>
+  <div class="form-card">
 
-  </section>
+    <form id="agentForm">
 
+      <div class="section">
 
-  <section class="features" id="features">
+        <h2>🤖 AI Agent</h2>
 
-    <div class="card">
+        <label>AI Agent Name</label>
 
-      <h3>🤖 AI Customer Support</h3>
+        <input
+          type="text"
+          id="agentName"
+          placeholder="Example: ShopBrain Assistant"
+          required
+        >
 
-      <p>
-        Let your AI answer customer questions automatically,
-        24/7.
-      </p>
-
-    </div>
-
-
-    <div class="card">
-
-      <h3>📚 Train Your AI</h3>
-
-      <p>
-        Add your products, FAQs, policies and business
-        information.
-      </p>
-
-    </div>
+      </div>
 
 
-    <div class="card">
+      <div class="section">
 
-      <h3>💬 Website Chat</h3>
+        <h2>🏢 Business Information</h2>
 
-      <p>
-        Give customers an easy way to chat with your AI
-        directly on your website.
-      </p>
+        <label>Business Name</label>
 
-    </div>
+        <input
+          type="text"
+          id="businessName"
+          placeholder="Example: Nestylo"
+          required
+        >
 
-  </section>
+        <label>What does your business do?</label>
+
+        <textarea
+          id="businessDescription"
+          placeholder="Describe your business, products or services..."
+          required
+        ></textarea>
+
+      </div>
 
 
-  <footer>
+      <div class="section">
 
-    © 2026 ShopBrain. All rights reserved.
+        <h2>📦 Products & Services</h2>
 
-  </footer>
+        <label>Products / Services</label>
+
+        <textarea
+          id="products"
+          placeholder="Example:
+
+Wireless Earbuds - $19.99
+Smart Watch - $29.99
+Phone Case - $9.99"
+        ></textarea>
+
+      </div>
+
+
+      <div class="section">
+
+        <h2>❓ Frequently Asked Questions</h2>
+
+        <label>FAQs and Answers</label>
+
+        <textarea
+          id="faqs"
+          placeholder="Example:
+
+Q: How long does delivery take?
+A: Delivery takes 3-5 business days.
+
+Q: Do you accept returns?
+A: Yes, within 14 days."
+        ></textarea>
+
+      </div>
+
+
+      <div class="section">
+
+        <h2>🚚 Policies</h2>
+
+        <label>Shipping Information</label>
+
+        <textarea
+          id="shipping"
+          placeholder="Enter your shipping information..."
+        ></textarea>
+
+        <label>Refund / Return Policy</label>
+
+        <textarea
+          id="refund"
+          placeholder="Enter your refund and return policy..."
+        ></textarea>
+
+      </div>
+
+
+      <div class="section">
+
+        <h2>🧠 AI Instructions</h2>
+
+        <label>How should your AI behave?</label>
+
+        <textarea
+          id="instructions"
+          placeholder="Example:
+
+Be friendly and professional.
+Keep answers short.
+Never invent prices.
+If you don't know something, tell the customer to contact support."
+        ></textarea>
+
+      </div>
+
+
+      <button class="button" type="submit">
+        Create AI Agent
+      </button>
+
+      <div class="success" id="success">
+        ✅ Your ShopBrain AI agent has been created!
+      </div>
+
+      <a href="chat.html" class="continue" id="continueButton">
+        💬 Test Your AI →
+      </a>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  const form = document.getElementById("agentForm");
+
+  form.addEventListener("submit", function(event) {
+
+    event.preventDefault();
+
+    const agent = {
+
+      agentName:
+        document.getElementById("agentName").value,
+
+      businessName:
+        document.getElementById("businessName").value,
+
+      businessDescription:
+        document.getElementById("businessDescription").value,
+
+      products:
+        document.getElementById("products").value,
+
+      faqs:
+        document.getElementById("faqs").value,
+
+      shipping:
+        document.getElementById("shipping").value,
+
+      refund:
+        document.getElementById("refund").value,
+
+      instructions:
+        document.getElementById("instructions").value
+
+    };
+
+
+    localStorage.setItem(
+      "shopbrainAgent",
+      JSON.stringify(agent)
+    );
+
+
+    document.getElementById("success").style.display = "block";
+
+    document.getElementById("continueButton").style.display = "block";
+
+  });
+
+</script>
 
 </body>
 </html>
