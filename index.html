@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>ShopBrain — AI Customer Service for Your Store</title>
+
+  <meta
+    name="description"
+    content="ShopBrain is an AI customer-service assistant that helps online stores answer customers automatically."
+  />
+
+  <meta name="theme-color" content="#0E1210" />
+
+  <style>
+    :root {
+      --bg: #0e1210;
+      --panel: #161b18;
+      --panel-2: #1b2118;
+      --line: #283029;
+      --text: #f1eee6;
+      --muted: #8a9690;
+      --faint: #5e6b62;
+      --gold: #d8c48a;
+      --gold-light: #e9dbaa;
+      --green: #7ca383;
+      --danger: #d98282;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    input,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .container {
+      width: min(100% - 32px, 760px);
+      margin: 0 auto;
+    }
+
+    /* NAVIGATION */
+
+    nav {
+      border-bottom: 1px solid var(--line);
+      padding: 18px 0;
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 15px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-weight: 800;
+    }
+
+    .logo-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 9px;
+      background: var(--gold);
+      color: var(--bg);
+      font-weight: 900;
+    }
+
+    .logo-name {
+      font-size: 16px;
+    }
+
+    .nav-label {
+      color: var(--faint);
+      font-size: 12px;
+    }
+
+    /* HERO */
+
+    .hero {
+      padding: 58px 0 35px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 11px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(124, 163, 131, 0.3);
+      border-radius: 999px;
+      background: rgba(124, 163, 131, 0.1);
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    h1 {
+      max-width: 680px;
+      margin-bottom: 17px;
+      font-size: clamp(32px, 8vw, 52px);
+      line-height: 1.08;
+      letter-spacing: -0.04em;
+    }
+
+    h1 span {
+      color: var(--gold);
+    }
+
+    .hero-text {
+      max-width: 610px;
+      margin-bottom: 27px;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+    }
+
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .button {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 15px 20px;
+      font-weight: 700;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .button-primary {
+      background: var(--gold);
+      color: var(--bg);
+    }
+
+    .button-secondary {
+      border: 1px solid var(--line);
+      background: transparent;
+      color: var(--text);
+    }
+
+    .button:hover {
+      opacity: 0.9;
+    }
+
+    /* DEMO */
+
+    .demo {
+      margin: 30px 0;
+      padding: 15px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: var(--panel);
+    }
+
+    .demo-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding-bottom: 13px;
+      margin-bottom: 13px;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .online-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+
+    .chat-message {
+      max-width: 82%;
+      margin-bottom: 9px;
+      padding: 10px 13px;
+      border-radius: 15px;
+      font-size: 13px;
+    }
+
+    .customer-message {
+      margin-left: auto;
+      border-bottom-right-radius: 4px;
+      background: var(--gold);
+      color: var(--bg);
+    }
+
+    .ai-message {
+      border: 1px solid var(--line);
+      border-bottom-left-radius: 4px;
+      background: var(--bg);
+    }
+
+    /* SECTION */
+
+    section {
+      padding: 45px 0;
+      border-top: 1px solid var(--line);
+    }
+
+    .section-label {
+      margin-bottom: 9px;
+      color: var(--faint);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    h2 {
+      margin-bottom: 9px;
+      font-size: 25px;
+      line-height: 1.2;
+    }
+
+    .section-description {
+      margin-bottom: 25px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    /* FEATURES */
+
+    .feature {
+      display: flex;
+      gap: 15px;
+      padding: 18px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .feature:last-child {
+      border-bottom: 0;
+    }
+
+    .feature-number {
+      flex: 0 0 29px;
+      width: 29px;
+      height: 29px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--line);
+      border-radius: 50%;
+      color: var(--gold);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .feature-title {
+      margin-bottom: 4px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .feature-text {
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    /* STORE CONNECTION */
+
+    .connection-card {
+      padding: 21px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: var(--panel);
+    }
+
+    .connection-card h3 {
+      margin-bottom: 7px;
+      font-size: 17px;
+    }
+
+    .connection-card p {
+      margin-bottom: 18px;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    .store-buttons {
+      display: grid;
+      gap: 10px;
+    }
+
+    .store-button {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--text);
+      font-weight: 700;
+      text-align: left;
+    }
+
+    .store-button:hover {
+      border-color: var(--gold);
+    }
+
+    /* TRAINING */
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .input,
+    .textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      outline: none;
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--text);
+      padding: 13px 14px;
+      font-size: 14px;
+    }
+
+    .textarea {
+      min-height: 150px;
+      resize: vertical;
+      line-height: 1.6;
+    }
+
+    .input:focus,
+    .textarea:focus {
+      border-color: var(--gold);
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: var(--faint);
+    }
+
+    .status {
+      display: none;
+      margin-top: 18px;
+      padding: 15px;
+      border: 1px solid rgba(124, 163, 131, 0.3);
+      border-radius: 11px;
+      background: rgba(124, 163, 131, 0.08);
+      color: var(--green);
+      font-size: 13px;
+    }
+
+    .status.show {
+      display: block;
+    }
+
+    /* CHAT */
+
+    .chat-box {
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+    }
+
+    .chat-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 15px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .chat-avatar {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--gold);
+      color: var(--bg);
+      font-weight: 900;
+    }
+
+    .chat-name {
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .chat-status {
+      color: var(--green);
+      font-size: 11px;
+    }
+
+    .chat-body {
+      min-height: 180px;
+      max-height: 350px;
+      overflow-y: auto;
+      padding: 15px;
+    }
+
+    .chat-input-row {
+      display: flex;
+      gap: 8px;
+      padding: 12px;
+      border-top: 1px solid var(--line);
+    }
+
+    .chat-input {
+      flex: 1;
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      outline: none;
+      background: var(--bg);
+      color: var(--text);
+      padding: 11px;
+    }
+
+    .chat-send {
+      border: 0;
+      border-radius: 9px;
+      background: var(--gold);
+      color: var(--bg);
+      padding: 0 15px;
+      font-weight: 800;
+    }
+
+    .user-chat,
+    .bot-chat {
+      max-width: 85%;
+      margin-bottom: 10px;
+      padding: 10px 12px;
+      border-radius: 13px;
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .user-chat {
+      margin-left: auto;
+      background: var(--gold);
+      color: var(--bg);
+    }
+
+    .bot-chat {
+      border: 1px solid var(--line);
+      background: var(--bg);
+    }
+
+    /* PRICING */
+
+    .plans {
+      display: grid;
+      gap: 14px;
+    }
+
+    .plan {
+      position: relative;
+      padding: 21px;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background: var(--panel);
+    }
+
+    .plan.featured {
+      border-color: var(--gold);
+      background: var(--panel-2);
+    }
+
+    .popular {
+      position: absolute;
+      top: -10px;
+      right: 17px;
+      padding: 4px 9px;
+      border-radius: 20px;
+      background: var(--gold);
+      color: var(--bg);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .plan-name {
+      margin-bottom: 5px;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .plan-description {
+      margin-bottom: 15px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .price {
+      margin-bottom: 15px;
+      font-size: 29px;
+      font-weight: 900;
+    }
+
+    .price small {
+      color: var(--faint);
+      font-size: 12px;
+      font-weight: 400;
+    }
+
+    .features {
+      list-style: none;
+      margin-bottom: 18px;
+    }
+
+    .features li {
+      position: relative;
+      padding: 5px 0 5px 20px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .features li::before {
+      content: "✓";
+      position: absolute;
+      left: 0;
+      color: var(--green);
+      font-weight: 800;
+    }
+
+    /* FINAL CTA */
+
+    .final {
+      padding: 60px 0;
+      text-align: center;
+    }
+
+    .final h2 {
+      font-size: 27px;
+    }
+
+    .final p {
+      max-width: 550px;
+      margin: 0 auto 23px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    /* FOOTER */
+
+    footer {
+      padding: 25px 0;
+      border-top: 1px solid var(--line);
+      color: var(--faint);
+      font-size: 12px;
+      text-align: center;
+    }
+
+    /* DESKTOP */
+
+    @media (min-width: 700px) {
+      .buttons {
+        flex-direction: row;
+      }
+
+      .button {
+        width: auto;
+      }
+
+      .store-buttons {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .plans {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAVIGATION -->
+  <nav>
+    <div class="container nav-inner">
+      <a href="#" class="logo" aria-label="ShopBrain home">
+        <div class="logo-mark">S</div>
+        <div class="logo-name">ShopBrain</div>
+      </a>
+
+      <div class="nav-label">AI customer service</div>
+    </div>
+  </nav>
+
+  <main>
+
+    <!-- HERO -->
+    <header class="hero">
+      <div class="container">
+
+        <div class="badge">
+          <span class="badge-dot"></span>
+          AI for online stores
+        </div>
+
+        <h1>
+          Let AI answer your
+          <span>customers 24/7.</span>
+        </h1>
+
+        <p class="hero-text">
+          ShopBrain learns about your products, prices, policies and business,
+          then helps answer customer questions automatically.
+        </p>
+
+        <div class="buttons">
+          <a href="#train" class="button button-primary">
+            Build your AI
+          </a>
+
+          <a href="#how" class="button button-secondary">
+            See how it works
+          </a>
+        </div>
+
+        <!-- DEMO -->
+        <div class="demo">
+
+          <div class="demo-header">
+            <span class="online-dot"></span>
+            ShopBrain AI is online
+          </div>
+
+          <div class="chat-message customer-message">
+            How much is your wireless earbuds?
+          </div>
+
+          <div class="chat-message ai-message">
+            The wireless earbuds are ₦12,000. Would you like to know
+            about delivery or availability?
+          </div>
+
+          <div class="chat-message customer-message">
+            How much is delivery in Lagos?
+          </div>
+
+          <div class="chat-message ai-message">
+            Delivery within Lagos is ₦1,500.
+          </div>
+
+        </div>
+
+      </div>
+    </header>
+
+    <!-- HOW IT WORKS -->
+    <section id="how">
+      <div class="container">
+
+        <div class="section-label">How it works</div>
+
+        <h2>Train it once. Let it handle the questions.</h2>
+
+        <p class="section-description">
+          ShopBrain is designed to give your customers quick answers
+          without requiring you to respond to every message manually.
+        </p>
+
+        <div class="feature">
+
+          <div class="feature-number">1</div>
+
+          <div>
+            <div class="feature-title">
+              Add your business information
+            </div>
+
+            <div class="feature-text">
+              Add your products, prices, FAQs, delivery information,
+              return policy and other important business information.
+            </div>
+          </div>
+
+        </div>
+
+        <div class="feature">
+
+          <div class="feature-number">2</div>
+
+          <div>
+            <div class="feature-title">
+              Connect your online store
+            </div>
+
+            <div class="feature-text">
+              Connect supported platforms such as Shopify so ShopBrain
+              can work with your store's authorized information.
+            </div>
+          </div>
+
+        </div>
+
+        <div class="feature">
+
+          <div class="feature-number">3</div>
+
+          <div>
+            <div class="feature-title">
+              Add the chatbot to your store
+            </div>
+
+            <div class="feature-text">
+              Your customers can then open the ShopBrain chat and ask
+              questions about your store.
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- STORE CONNECTION -->
+    <section id="connect">
+      <div class="container">
+
+        <div class="section-label">Store connection</div>
+
+        <h2>Connect your store</h2>
+
+        <p class="section-description">
+          Shopify connection will allow ShopBrain to securely work with
+          information that your store authorizes.
+        </p>
+
+        <div class="connection-card">
+
+          <h3>Choose your store platform</h3>
+
+          <p>
+            Shopify will be the first platform supported by the ShopBrain
+            integration. More platforms can be added later.
+          </p>
+
+          <div class="store-buttons">
+
+            <button
+              class="store-button"
+              type="button"
+              onclick="connectShopify()"
+            >
+              🛍️ Connect Shopify
+            </button>
+
+            <button
+              class="store-button"
+              type="button"
+              onclick="comingSoon('WooCommerce')"
+            >
+              🛒 WooCommerce — Coming soon
+            </button>
+
+          </div>
+
+          <div id="connectionStatus" class="status"></div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- TRAIN YOUR AI -->
+    <section id="train">
+      <div class="container">
+
+        <div class="section-label">Create your assistant</div>
+
+        <h2>Train your ShopBrain AI</h2>
+
+        <p class="section-description">
+          Start by giving ShopBrain basic information about your business.
+          The real AI backend will be connected in the next development stage.
+        </p>
+
+        <div class="form-group">
+
+          <label class="form-label" for="businessName">
+            Business name
+          </label>
+
+          <input
+            id="businessName"
+            class="input"
+            type="text"
+            placeholder="e.g. Shopora Markethub"
+            autocomplete="organization"
+          />
+
+        </div>
+
+        <div class="form-group">
+
+          <label class="form-label" for="businessInfo">
+            Products, prices, FAQs and policies
+          </label>
+
+          <textarea
+            id="businessInfo"
+            class="textarea"
+            placeholder="Example:
+
+We sell wireless earbuds for ₦12,000.
+Power banks start from ₦8,500.
+Lagos delivery is ₦1,500.
+Outside Lagos delivery is ₦3,000.
+Returns are accepted within 3 days if the product is faulty."
+          ></textarea>
+
+        </div>
+
+        <button
+          type="button"
+          class="button button-primary"
+          onclick="saveTraining()"
+        >
+          Save business information
+        </button>
+
+        <div id="trainingStatus" class="status"></div>
+
+      </div>
+    </section>
+
+    <!-- CHAT DEMO -->
+    <section id="chat">
+      <div class="container">
+
+        <div class="section-label">AI preview</div>
+
+        <h2>Test your assistant</h2>
+
+        <p class="section-description">
+          This is the frontend chat interface. The production AI API will
+          be connected here later.
+        </p>
+
+        <div class="chat-box">
+
+          <div class="chat-header">
+
+            <div class="chat-avatar">S</div>
+
+            <div>
+              <div class="chat-name">ShopBrain AI</div>
+              <div class="chat-status">● Ready</div>
+            </div>
+
+          </div>
+
+          <div
+            id="chatBody"
+            class="chat-body"
+          >
+
+            <div class="bot-chat">
+              Hi! I'm your ShopBrain assistant. Ask me something about
+              the business information you entered.
+            </div>
+
+          </div>
+
+          <form
+            class="chat-input-row"
+            onsubmit="sendMessage(event)"
+          >
+
+            <input
+              id="chatInput"
+              class="chat-input"
+              type="text"
+              placeholder="Ask a question..."
+              autocomplete="off"
+            />
+
+            <button
+              class="chat-send"
+              type="submit"
+            >
+              Send
+            </button>
+
+          </form>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- PRICING -->
+    <section id="pricing">
+      <div class="container">
+
+        <div class="section-label">Pricing</div>
+
+        <h2>Simple plans for growing stores</h2>
+
+        <p class="section-description">
+          These are placeholder plans for the MVP. Payment processing
+          can be connected after the core product works.
+        </p>
+
+        <div class="plans">
+
+          <article class="plan">
+
+            <div class="plan-name">
+              Self-Train
+            </div>
+
+            <div class="plan-description">
+              Manage your own AI knowledge.
+            </div>
+
+            <div class="price">
+              ₦1,500
+              <small>/month</small>
+            </div>
+
+            <ul class="features">
+              <li>Business knowledge base</li>
+              <li>AI customer service</li>
+              <li>Store connection</li>
+              <li>Up to 300 replies/month</li>
+            </ul>
+
+            <a
+              href="#train"
+              class="button button-secondary"
+            >
+              Start
+            </a>
+
+          </article>
+
+          <article class="plan featured">
+
+            <div class="popular">
+              MOST POPULAR
+            </div>
+
+            <div class="plan-name">
+              Done-For-You
+            </div>
+
+            <div class="plan-description">
+              We help configure your AI.
+            </div>
+
+            <div class="price">
+              ₦6,000
+              <small>/month</small>
+            </div>
+
+            <ul class="features">
+              <li>Everything in Self-Train</li>
+              <li>AI knowledge setup</li>
+              <li>Store integration assistance</li>
+              <li>Up to 500 replies/month</li>
+            </ul>
+
+            <a
+              href="#connect"
+              class="button button-primary"
+            >
+              Get started
+            </a>
+
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section class="final">
+
+      <div class="container">
+
+        <h2>
+          Stop answering the same questions all day.
+        </h2>
+
+        <p>
+          Build a customer-service assistant that knows your business
+          and helps your customers find answers faster.
+        </p>
+
+        <div class="buttons">
+
+          <a
+            href="#train"
+            class="button button-primary"
+          >
+            Create ShopBrain
+          </a>
+
+          <a
+            href="#connect"
+            class="button button-secondary"
+          >
+            Connect a store
+          </a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="container">
+      © 2026 ShopBrain. AI customer service for online stores.
+    </div>
+  </footer>
+
+
+  <script>
+    /*
+      SHOPBRAIN FRONTEND
+
+      Important:
+      This file is currently the frontend MVP.
+
+      The following production features will be connected later:
+
+      1. Real AI API
+      2. Database
+      3. User accounts
+      4. Shopify OAuth
+      5. Shopify API
+      6. Product synchronization
+      7. AI knowledge retrieval
+      8. Production chatbot widget
+      9. Payments/subscriptions
+    */
+
+
+    // --------------------------------------------------
+    // LOCAL BUSINESS PROFILE
+    // --------------------------------------------------
+
+    function saveTraining() {
+
+      const businessName =
+        document.getElementById("businessName").value.trim();
+
+      const businessInfo =
+        document.getElementById("businessInfo").value.trim();
+
+      const status =
+        document.getElementById("trainingStatus");
+
+
+      if (!businessName) {
+        showStatus(
+          status,
+          "Please enter your business name.",
+          true
+        );
+        return;
+      }
+
+
+      if (!businessInfo) {
+        showStatus(
+          status,
+          "Please enter some business information.",
+          true
+        );
+        return;
+      }
+
+
+      const profile = {
+        businessName: businessName,
+        businessInfo: businessInfo,
+        updatedAt: new Date().toISOString()
+      };
+
+
+      try {
+
+        localStorage.setItem(
+          "shopbrain_business_profile",
+          JSON.stringify(profile)
+        );
+
+        showStatus(
+          status,
+          "Business information saved. Your AI knowledge base is ready for the next integration step.",
+          false
+        );
+
+      } catch (error) {
+
+        showStatus(
+          status,
+          "Unable to save the information on this device.",
+          true
+        );
+
+      }
+    }
+
+
+    function loadTraining() {
+
+      try {
+
+        const saved =
+          localStorage.getItem(
+            "shopbrain_business_profile"
+          );
+
+        if (!saved) return;
+
+        const profile =
+          JSON.parse(saved);
+
+        if (profile.businessName) {
+
+          document.getElementById(
+            "businessName"
+          ).value = profile.businessName;
+
+        }
+
+        if (profile.businessInfo) {
+
+          document.getElementById(
+            "businessInfo"
+          ).value = profile.businessInfo;
+
+        }
+
+      } catch (error) {
+
+        console.log(
+          "No saved ShopBrain profile."
+        );
+
+      }
+    }
+
+
+    // --------------------------------------------------
+    // SHOPIFY CONNECTION
+    // --------------------------------------------------
+
+    function connectShopify() {
+
+      const status =
+        document.getElementById(
+          "connectionStatus"
+        );
+
+
+      /*
+        IMPORTANT:
+
+        This button is intentionally not pretending
+        to connect Shopify yet.
+
+        The production version will redirect the merchant
+        to your backend Shopify OAuth endpoint, for example:
+
+        /api/shopify/install
+
+        Your backend will then handle Shopify's authorization.
+
+        Do NOT put Shopify API secrets inside this HTML file.
+      */
+
+
+      showStatus(
+        status,
+        "Shopify connection is the next integration. The secure Shopify authorization flow will be connected through the ShopBrain backend.",
+        false
+      );
+
+    }
+
+
+    function comingSoon(platform) {
+
+      const status =
+        document.getElementById(
+          "connectionStatus"
+        );
+
+      showStatus(
+        status,
+        platform + " integration is coming soon.",
+        false
+      );
+
+    }
+
+
+    // --------------------------------------------------
+    // CHAT FRONTEND
+    // --------------------------------------------------
+
+    function sendMessage(event) {
+
+      event.preventDefault();
+
+
+      const input =
+        document.getElementById(
+          "chatInput"
+        );
+
+      const chatBody =
+        document.getElementById(
+          "chatBody"
+        );
+
+
+      const message =
+        input.value.trim();
+
+
+      if (!message) return;
+
+
+      // Customer message
+
+      const userMessage =
+        document.createElement("div");
+
+      userMessage.className =
+        "user-chat";
+
+      userMessage.textContent =
+        message;
+
+      chatBody.appendChild(
+        userMessage
+      );
+
+
+      input.value = "";
+
+
+      /*
+        Temporary frontend response.
+
+        Later this will become:
+
+        browser
+          ↓
+        ShopBrain backend
+          ↓
+        store knowledge
+          ↓
+        AI API
+          ↓
+        response
+          ↓
+        browser
+      */
+
+
+      setTimeout(() => {
+
+        const response =
+          document.createElement("div");
+
+        response.className =
+          "bot-chat";
+
+        response.textContent =
+          generateDemoResponse(message);
+
+        chatBody.appendChild(
+          response
+        );
+
+        chatBody.scrollTop =
+          chatBody.scrollHeight;
+
+      }, 500);
+
+    }
+
+
+    function generateDemoResponse(message) {
+
+      const profile =
+        getSavedProfile();
+
+
+      if (!profile) {
+
+        return "Please enter your business information first. The real AI backend will use your store's knowledge to answer customer questions.";
+
+      }
+
+
+      const lower =
+        message.toLowerCase();
+
+
+      if (
+        lower.includes("price") ||
+        lower.includes("cost") ||
+        lower.includes("how much")
+      ) {
+
+        return "I can answer product-price questions once the ShopBrain AI backend is connected to your business knowledge.";
+
+      }
+
+
+      if (
+        lower.includes("delivery") ||
+        lower.includes("shipping")
+      ) {
+
+        return "I can answer delivery and shipping questions once the ShopBrain AI backend is connected.";
+
+      }
+
+
+      return (
+        "I received your question. The production ShopBrain AI will use " +
+        profile.businessName +
+        "'s knowledge base to provide the actual answer."
+      );
+
+    }
+
+
+    function getSavedProfile() {
+
+      try {
+
+        const saved =
+          localStorage.getItem(
+            "shopbrain_business_profile"
+          );
+
+        if (!saved) return null;
+
+        return JSON.parse(saved);
+
+      } catch (error) {
+
+        return null;
+
+      }
+
+    }
+
+
+    // --------------------------------------------------
+    // STATUS MESSAGE
+    // --------------------------------------------------
+
+    function showStatus(
+      element,
+      message,
+      isError
+    ) {
+
+      element.textContent =
+        message;
+
+      element.classList.add(
+        "show"
+      );
+
+
+      if (isError) {
+
+        element.style.color =
+          "var(--danger)";
+
+      } else {
+
+        element.style.color =
+          "var(--green)";
+
+      }
+
+    }
+
+
+    // --------------------------------------------------
+    // STARTUP
+    // --------------------------------------------------
+
+    document.addEventListener(
+      "DOMContentLoaded",
+      () => {
+
+        loadTraining();
+
+      }
+    );
+
+  </script>
+
+</body>
+</html>
