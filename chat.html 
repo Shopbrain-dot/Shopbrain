@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ShopBrain AI</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+}
+
+.header {
+  background: #111827;
+  color: white;
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logo span {
+  color: #3b82f6;
+}
+
+.back {
+  color: white;
+  text-decoration: none;
+}
+
+.chat {
+  max-width: 750px;
+  margin: 30px auto;
+  background: white;
+  height: 80vh;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 25px rgba(0,0,0,.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.chat-header h2 {
+  margin: 0 0 5px;
+}
+
+.chat-header p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.message.user {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 78%;
+  padding: 13px 16px;
+  border-radius: 15px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.ai .bubble {
+  background: #f3f4f6;
+}
+
+.user .bubble {
+  background: #2563eb;
+  color: white;
+}
+
+.input-area {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  border-top: 1px solid #eee;
+}
+
+input {
+  flex: 1;
+  padding: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  font-size: 15px;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 9px;
+  padding: 0 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+@media (max-width: 700px) {
+  .chat {
+    margin: 0;
+    width: 100%;
+    height: calc(100vh - 60px);
+    border-radius: 0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+
+  <div class="logo">
+    Shop<span>Brain</span>
+  </div>
+
+  <a
+    href="dashboard.html"
+    class="back"
+  >
+    Dashboard
+  </a>
+
+</div>
+
+
+<div class="chat">
+
+  <div class="chat-header">
+
+    <h2 id="agentName">
+      ShopBrain AI
+    </h2>
+
+    <p id="businessName">
+      Customer Service Assistant
+    </p>
+
+  </div>
+
+
+  <div
+    class="messages"
+    id="messages"
+  ></div>
+
+
+  <div class="input-area">
+
+    <input
+      id="userInput"
+      type="text"
+      placeholder="Ask your AI something..."
+    >
+
+    <button
+      id="sendButton"
+    >
+      Send
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/*
+==================================================
+LOAD THE AI
+==================================================
+*/
+
+const savedAgent =
+  localStorage.getItem("shopbrainAgent");
+
+
+if (!savedAgent) {
+
+  window.location.href =
+    "agent.html";
+
+}
+
+
+const agent =
+  JSON.parse(savedAgent);
+
+
+/*
+==================================================
+DISPLAY AGENT
+==================================================
+*/
+
+document.getElementById(
+  "agentName"
+).textContent =
+  agent.agentName ||
+  "ShopBrain AI";
+
+
+document.getElementById(
+  "businessName"
+).textContent =
+  agent.businessName ||
+  "Customer Service Assistant";
+
+
+/*
+==================================================
+CHAT ELEMENTS
+==================================================
+*/
+
+const messages =
+  document.getElementById("messages");
+
+const input =
+  document.getElementById("userInput");
+
+const sendButton =
+  document.getElementById("sendButton");
+
+
+/*
+==================================================
+ADD MESSAGE
+==================================================
+*/
+
+function addMessage(
+  text,
+  type
+) {
+
+  const message =
+    document.createElement("div");
+
+  message.className =
+    "message " + type;
+
+
+  const bubble =
+    document.createElement("div");
+
+  bubble.className =
+    "bubble";
+
+
+  bubble.textContent =
+    text;
+
+
+  message.appendChild(
+    bubble
+  );
+
+  messages.appendChild(
+    message
+  );
+
+
+  messages.scrollTop =
+    messages.scrollHeight;
+
+}
+
+
+/*
+==================================================
+WELCOME MESSAGE
+==================================================
+*/
+
+addMessage(
+  "Hi! 👋 I'm " +
+  (agent.agentName || "your AI assistant") +
+  ". How can I help you today?",
+  "ai"
+);
+
+
+/*
+==================================================
+BUILD ALL AI KNOWLEDGE
+==================================================
+*/
+
+function getKnowledge() {
+
+  let knowledge = "";
+
+
+  if (agent.businessDescription) {
+
+    knowledge +=
+      "\nBUSINESS:\n" +
+      agent.businessDescription;
+
+  }
+
+
+  if (agent.products) {
+
+    knowledge +=
+      "\n\nPRODUCTS AND SERVICES:\n" +
+      agent.products;
+
+  }
+
+
+  if (agent.shipping) {
+
+    knowledge +=
+      "\n\nSHIPPING:\n" +
+      agent.shipping;
+
+  }
+
+
+  if (agent.refund) {
+
+    knowledge +=
+      "\n\nREFUNDS AND RETURNS:\n" +
+      agent.refund;
+
+  }
+
+
+  if (agent.faqs) {
+
+    knowledge +=
+      "\n\nFAQS:\n" +
+      agent.faqs;
+
+  }
+
+
+  /*
+    IMPORTANT:
+    Include ALL additional training.
+  */
+
+  if (agent.training) {
+
+    knowledge +=
+      "\n\nADDITIONAL TRAINING:\n" +
+      agent.training;
+
+  }
+
+
+  return knowledge.trim();
+
+}
+
+
+/*
+==================================================
+FIND RELEVANT INFORMATION
+==================================================
+*/
+
+function searchKnowledge(question) {
+
+  const knowledge =
+    getKnowledge();
+
+
+  if (!knowledge) {
+
+    return null;
+
+  }
+
+
+  const questionWords =
+    question
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(word =>
+        word.length > 2
+      );
+
+
+  const sections =
+    knowledge.split(/\n(?=[A-Z][A-Z ]+:)/);
+
+
+  let bestSection = null;
+
+  let bestScore = 0;
+
+
+  sections.forEach(
+    function(section) {
+
+      const lower =
+        section.toLowerCase();
+
+
+      let score = 0;
+
+
+      questionWords.forEach(
+        function(word) {
+
+          if (
+            lower.includes(word)
+          ) {
+
+            score++;
+
+          }
+
+        }
+      );
+
+
+      if (
+        score > bestScore
+      ) {
+
+        bestScore =
+          score;
+
+        bestSection =
+          section;
+
+      }
+
+    }
+  );
+
+
+  if (
+    bestScore >= 1
+  ) {
+
+    return bestSection;
+
+  }
+
+
+  return null;
+
+}
+
+
+/*
+==================================================
+GENERATE RESPONSE
+==================================================
+*/
+
+function getAIResponse(
+  question
+) {
+
+  const q =
+    question
+      .toLowerCase()
+      .trim();
+
+
+  const business =
+    agent.businessName ||
+    "our business";
+
+
+  /*
+    GREETINGS
+  */
+
+  if (
+    q === "hi" ||
+    q === "hello" ||
+    q === "hey" ||
+    q.includes("good morning") ||
+    q.includes("good afternoon") ||
+    q.includes("good evening")
+  ) {
+
+    return (
+      "Hi! 👋 Welcome to " +
+      business +
+      ". How can I help you today?"
+    );
+
+  }
+
+
+  /*
+    THANK YOU
+  */
+
+  if (
+    q.includes("thank you") ||
+    q.includes("thanks")
+  ) {
+
+    return (
+      "You're welcome! 😊 " +
+      "I'm happy to help."
+    );
+
+  }
+
+
+  /*
+    GOODBYE
+  */
+
+  if (
+    q === "bye" ||
+    q.includes("goodbye")
+  ) {
+
+    return (
+      "Thanks for chatting with " +
+      business +
+      "! 👋"
+    );
+
+  }
+
+
+  /*
+    SEARCH TRAINED KNOWLEDGE
+  */
+
+  const relevant =
+    searchKnowledge(
+      question
+    );
+
+
+  if (relevant) {
+
+    /*
+      Remove section title
+      when displaying answer.
+    */
+
+    return relevant
+      .replace(
+        /^[A-Z][A-Z ]+:\s*/i,
+        ""
+      )
+      .trim();
+
+  }
+
+
+  /*
+    PRODUCT QUESTIONS
+  */
+
+  if (
+    q.includes("product") ||
+    q.includes("price") ||
+    q.includes("cost") ||
+    q.includes("how much")
+  ) {
+
+    if (agent.products) {
+
+      return (
+        "Here is our product information:\n\n" +
+        agent.products
+      );
+
+    }
+
+  }
+
+
+  /*
+    SHIPPING
+  */
+
+  if (
+    q.includes("shipping") ||
+    q.includes("delivery") ||
+    q.includes("deliver")
+  ) {
+
+    if (agent.shipping) {
+
+      return (
+        "Here is our shipping information:\n\n" +
+        agent.shipping
+      );
+
+    }
+
+  }
+
+
+  /*
+    REFUNDS
+  */
+
+  if (
+    q.includes("refund") ||
+    q.includes("return") ||
+    q.includes("exchange")
+  ) {
+
+    if (agent.refund) {
+
+      return (
+        "Here is our refund policy:\n\n" +
+        agent.refund
+      );
+
+    }
+
+  }
+
+
+  /*
+    BUSINESS
+  */
+
+  if (
+    q.includes("what do you sell") ||
+    q.includes("what do you offer") ||
+    q.includes("your business")
+  ) {
+
+    if (
+      agent.businessDescription
+    ) {
+
+      return agent.businessDescription;
+
+    }
+
+  }
+
+
+  /*
+    NO INFORMATION
+  */
+
+  return (
+    "I don't have that information yet. " +
+    "You can train me with the answer and " +
+    "I'll be able to use that information."
+  );
+
+}
+
+
+/*
+==================================================
+SEND MESSAGE
+==================================================
+*/
+
+function sendMessage() {
+
+  const question =
+    input.value.trim();
+
+
+  if (!question) {
+
+    return;
+
+  }
+
+
+  addMessage(
+    question,
+    "user"
+  );
+
+
+  input.value = "";
+
+
+  /*
+    Simulate AI thinking
+  */
+
+  setTimeout(
+    function() {
+
+      const answer =
+        getAIResponse(
+          question
+        );
+
+
+      addMessage(
+        answer,
+        "ai"
+      );
+
+    },
+    400
+  );
+
+}
+
+
+/*
+==================================================
+SEND BUTTON
+==================================================
+*/
+
+sendButton.addEventListener(
+  "click",
+  sendMessage
+);
+
+
+/*
+==================================================
+ENTER KEY
+==================================================
+*/
+
+input.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (
+      event.key === "Enter"
+    ) {
+
+      sendMessage();
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
