@@ -1,0 +1,868 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Create AI - ShopBrain</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+  color: #111827;
+}
+
+header {
+  background: #111827;
+  color: white;
+  padding: 18px;
+}
+
+.header {
+  max-width: 900px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logo span {
+  color: #3b82f6;
+}
+
+.back {
+  color: white;
+  text-decoration: none;
+}
+
+.container {
+  max-width: 700px;
+  margin: 45px auto;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  padding: 30px;
+  border-radius: 16px;
+  box-shadow: 0 5px 25px rgba(0,0,0,.07);
+}
+
+h1 {
+  margin-top: 0;
+}
+
+.subtitle {
+  color: #6b7280;
+  line-height: 1.6;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  font-size: 15px;
+  font-family: Arial, sans-serif;
+}
+
+textarea {
+  min-height: 130px;
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+button {
+  width: 100%;
+  margin-top: 25px;
+  padding: 15px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 9px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.message {
+  display: none;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-radius: 9px;
+  line-height: 1.5;
+}
+
+.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.info {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.hidden {
+  display: none;
+}
+
+.loading {
+  text-align: center;
+  padding: 30px;
+  color: #6b7280;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="header">
+
+<div class="logo">
+Shop<span>Brain</span>
+</div>
+
+<a
+href="dashboard.html"
+class="back"
+>
+← Dashboard
+</a>
+
+</div>
+
+</header>
+
+
+<div class="container">
+
+<div class="card">
+
+<div
+id="loading"
+class="loading"
+>
+Checking your ShopBrain account...
+</div>
+
+
+<div id="mainContent" class="hidden">
+
+<h1>🤖 Create Your AI Agent</h1>
+
+<p class="subtitle">
+Create your customer-service AI. You can train
+this AI unlimited times after creating it.
+</p>
+
+
+<div
+id="errorMessage"
+class="message error"
+></div>
+
+
+<div
+id="successMessage"
+class="message success"
+></div>
+
+
+<div id="formArea">
+
+<label for="agentName">
+AI Agent Name
+</label>
+
+<input
+id="agentName"
+type="text"
+placeholder="Example: Shop Assistant"
+>
+
+
+<label for="businessName">
+Business Name
+</label>
+
+<input
+id="businessName"
+type="text"
+placeholder="Example: Shopora Market Hub"
+>
+
+
+<label for="businessDescription">
+Tell your AI about the business
+</label>
+
+<textarea
+id="businessDescription"
+placeholder="Example:
+
+We sell gadgets and electronics.
+We deliver worldwide.
+Customers can contact us for support."
+></textarea>
+
+
+<label for="products">
+Products and Services
+</label>
+
+<textarea
+id="products"
+placeholder="Example:
+
+iPhone 15 - $699
+Samsung S25 - $799
+Wireless Earbuds - $29"
+></textarea>
+
+
+<label for="shipping">
+Shipping Information
+</label>
+
+<textarea
+id="shipping"
+placeholder="Example:
+
+We deliver worldwide.
+Delivery takes 3-5 business days."
+></textarea>
+
+
+<label for="refund">
+Refund and Return Policy
+</label>
+
+<textarea
+id="refund"
+placeholder="Example:
+
+Customers can return products within 14 days."
+></textarea>
+
+
+<label for="faqs">
+Frequently Asked Questions
+</label>
+
+<textarea
+id="faqs"
+placeholder="Example:
+
+Q: Do you deliver internationally?
+A: Yes, we deliver worldwide."
+></textarea>
+
+
+<button
+id="createButton"
+>
+🚀 Create AI Agent
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+
+<!-- Supabase -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase-config.js"></script>
+
+
+<script>
+
+let currentUser = null;
+
+
+/*
+========================================
+CHECK SUPABASE LOGIN
+========================================
+*/
+
+async function checkUser() {
+
+  try {
+
+    const {
+      data: {
+        session
+      },
+      error
+    } =
+      await supabaseClient.auth.getSession();
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    /*
+    User isn't logged in.
+    */
+
+    if (!session) {
+
+      window.location.href =
+        "login.html";
+
+      return;
+
+    }
+
+
+    currentUser =
+      session.user;
+
+
+    /*
+    Show the page.
+    */
+
+    document
+      .getElementById("loading")
+      .style.display = "none";
+
+
+    document
+      .getElementById("mainContent")
+      .classList.remove("hidden");
+
+
+    /*
+    Check whether this user already
+    has an AI agent.
+    */
+
+    await checkExistingAgent();
+
+
+  } catch (error) {
+
+    console.error(
+      "Authentication error:",
+      error
+    );
+
+
+    document
+      .getElementById("loading")
+      .textContent =
+      "Unable to verify your account. Please login again.";
+
+  }
+
+}
+
+
+/*
+========================================
+CHECK EXISTING AI
+========================================
+*/
+
+async function checkExistingAgent() {
+
+  try {
+
+    const {
+      data,
+      error
+    } =
+      await supabaseClient
+        .from("agents")
+        .select("*")
+        .eq("user_id", currentUser.id)
+        .limit(1);
+
+
+    if (error) {
+      throw error;
+    }
+
+
+    /*
+    User already has an AI.
+    */
+
+    if (data && data.length > 0) {
+
+      document
+        .getElementById("formArea")
+        .classList.add("hidden");
+
+
+      const errorBox =
+        document.getElementById(
+          "errorMessage"
+        );
+
+
+      errorBox.textContent =
+        "You already have an AI agent. Each account can create only one AI. Please use Train AI from your dashboard.";
+
+      errorBox.style.display =
+        "block";
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Agent check error:",
+      error
+    );
+
+
+    showError(
+      "Could not check your existing AI agent. Please try again."
+    );
+
+  }
+
+}
+
+
+/*
+========================================
+CREATE AI
+========================================
+*/
+
+document
+  .getElementById("createButton")
+  .addEventListener(
+    "click",
+    async function() {
+
+
+      /*
+      Make sure user is logged in.
+      */
+
+      if (!currentUser) {
+
+        window.location.href =
+          "login.html";
+
+        return;
+
+      }
+
+
+      const agentName =
+        document
+          .getElementById("agentName")
+          .value
+          .trim();
+
+
+      const businessName =
+        document
+          .getElementById("businessName")
+          .value
+          .trim();
+
+
+      const businessDescription =
+        document
+          .getElementById("businessDescription")
+          .value
+          .trim();
+
+
+      const products =
+        document
+          .getElementById("products")
+          .value
+          .trim();
+
+
+      const shipping =
+        document
+          .getElementById("shipping")
+          .value
+          .trim();
+
+
+      const refund =
+        document
+          .getElementById("refund")
+          .value
+          .trim();
+
+
+      const faqs =
+        document
+          .getElementById("faqs")
+          .value
+          .trim();
+
+
+      /*
+      Validate required fields.
+      */
+
+      if (!agentName) {
+
+        showError(
+          "Please enter a name for your AI agent."
+        );
+
+        return;
+
+      }
+
+
+      if (!businessName) {
+
+        showError(
+          "Please enter your business name."
+        );
+
+        return;
+
+      }
+
+
+      const button =
+        document.getElementById(
+          "createButton"
+        );
+
+
+      button.disabled =
+        true;
+
+      button.textContent =
+        "Creating AI...";
+
+
+      try {
+
+        /*
+        Create the agent in Supabase.
+        */
+
+        const {
+          data,
+          error
+        } =
+          await supabaseClient
+            .from("agents")
+            .insert({
+
+              user_id:
+                currentUser.id,
+
+              name:
+                agentName,
+
+              welcome_message:
+                "Hi! How can I help you today?"
+
+            })
+            .select()
+            .single();
+
+
+        if (error) {
+          throw error;
+        }
+
+
+        /*
+        Save the business information
+        as training/knowledge entries.
+        */
+
+        const knowledge = [];
+
+
+        if (businessDescription) {
+
+          knowledge.push({
+
+            agent_id:
+              data.id,
+
+            type:
+              "info",
+
+            title:
+              "Business Information",
+
+            content:
+              businessDescription
+
+          });
+
+        }
+
+
+        if (products) {
+
+          knowledge.push({
+
+            agent_id:
+              data.id,
+
+            type:
+              "product",
+
+            title:
+              "Products and Services",
+
+            content:
+              products
+
+          });
+
+        }
+
+
+        if (shipping) {
+
+          knowledge.push({
+
+            agent_id:
+              data.id,
+
+            type:
+              "policy",
+
+            title:
+              "Shipping Information",
+
+            content:
+              shipping
+
+          });
+
+        }
+
+
+        if (refund) {
+
+          knowledge.push({
+
+            agent_id:
+              data.id,
+
+            type:
+              "policy",
+
+            title:
+              "Refund and Return Policy",
+
+            content:
+              refund
+
+          });
+
+        }
+
+
+        if (faqs) {
+
+          knowledge.push({
+
+            agent_id:
+              data.id,
+
+            type:
+              "faq",
+
+            title:
+              "Frequently Asked Questions",
+
+            content:
+              faqs
+
+          });
+
+        }
+
+
+        /*
+        Save training information.
+        */
+
+        if (knowledge.length > 0) {
+
+          const {
+            error:
+              knowledgeError
+          } =
+            await supabaseClient
+              .from("knowledge_entries")
+              .insert(knowledge);
+
+
+          if (knowledgeError) {
+
+            console.error(
+              "Knowledge save error:",
+              knowledgeError
+            );
+
+          }
+
+        }
+
+
+        /*
+        Show success.
+        */
+
+        document
+          .getElementById("formArea")
+          .classList.add("hidden");
+
+
+        document
+          .getElementById("successMessage")
+          .textContent =
+          "✅ Your AI agent has been created successfully!";
+
+
+        document
+          .getElementById("successMessage")
+          .style.display =
+          "block";
+
+
+        /*
+        Go back to dashboard.
+        */
+
+        setTimeout(
+          function() {
+
+            window.location.href =
+              "dashboard.html";
+
+          },
+          1200
+        );
+
+
+      } catch (error) {
+
+        console.error(
+          "Create agent error:",
+          error
+        );
+
+
+        showError(
+          error.message ||
+          "Could not create your AI agent."
+        );
+
+
+        button.disabled =
+          false;
+
+        button.textContent =
+          "🚀 Create AI Agent";
+
+      }
+
+    }
+  );
+
+
+/*
+========================================
+SHOW ERROR
+========================================
+*/
+
+function showError(message) {
+
+  const errorBox =
+    document.getElementById(
+      "errorMessage"
+    );
+
+
+  errorBox.textContent =
+    message;
+
+
+  errorBox.style.display =
+    "block";
+
+}
+
+
+/*
+========================================
+START
+========================================
+*/
+
+checkUser();
+
+</script>
+
+</body>
+</html>
