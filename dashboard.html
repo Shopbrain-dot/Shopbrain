@@ -51,6 +51,13 @@ header {
   cursor: pointer;
 }
 
+/* Visible focus styles for keyboard users */
+.logout:focus-visible,
+.button:focus-visible {
+  outline: 3px solid #93c5fd; /* light blue */
+  outline-offset: 3px;
+}
+
 .container {
   max-width: 1000px;
   margin: 40px auto;
@@ -121,10 +128,12 @@ header {
   background: #ea580c;
 }
 
+/* Progressive enhancement: show createAI by default for users without JS */
 #createAI {
-  display: none;
+  display: block;
 }
 
+/* myAI hidden by default until JS reveals it */
 #myAI {
   display: none;
 }
@@ -147,6 +156,7 @@ Shop<span>Brain</span>
 <button
 class="logout"
 onclick="logout()"
+aria-label="Logout of ShopBrain"
 >
 Logout
 </button>
@@ -156,7 +166,7 @@ Logout
 </header>
 
 
-<div class="container">
+<main class="container" role="main">
 
 
 <div class="welcome">
@@ -178,7 +188,6 @@ Manage your customer-service AI from here.
 class="card"
 id="createAI"
 >
-
 <h2>
 🤖 Create Your AI
 </h2>
@@ -191,6 +200,8 @@ Each account can create only one AI.
 <a
 href="agent.html"
 class="button"
+aria-label="Create AI Agent"
+rel="noopener"
 >
 🚀 Create AI Agent
 </a>
@@ -204,7 +215,6 @@ class="button"
 class="card"
 id="myAI"
 >
-
 <h2>
 🤖 Your AI Agent
 </h2>
@@ -225,7 +235,7 @@ Your Business
 
 <p>
 Status:
-<span class="status">
+<span class="status" role="status" aria-live="polite">
 ● Active
 </span>
 </p>
@@ -238,6 +248,8 @@ Status:
 <a
 href="train.html"
 class="button green"
+aria-label="Train AI"
+rel="noopener"
 >
 🧠 Train AI
 </a>
@@ -246,22 +258,28 @@ class="button green"
 <a
 href="chat.html"
 class="button"
+aria-label="Test AI"
+rel="noopener"
 >
 💬 Test AI
 </a>
 
 
 <a
-href="train.html"
+href="manage.html"
 class="button dark"
+aria-label="Manage AI settings"
+rel="noopener"
 >
 ⚙️ Manage AI
 </a>
 
 
 <a
-href="chat.html"
+href="connect.html"
 class="button orange"
+aria-label="Connect website"
+rel="noopener"
 >
 🔗 Connect Website
 </a>
@@ -293,143 +311,79 @@ knowledge whenever you want.
 </div>
 
 
-</div>
+</main>
 
 
 <script>
 
-
 /*
 Check if account exists.
 */
-
-const user =
-localStorage.getItem("shopbrainUser");
-
+const user = localStorage.getItem("shopbrainUser");
 
 if (!user) {
-
-window.location.href =
-"signup.html";
-
+  // If there's no saved user, send them to signup.
+  window.location.href = "signup.html";
 }
 
-
 /*
-Load account information.
+Load account information and personalize welcome if possible.
 */
-
 try {
-
-const userData =
-JSON.parse(user);
-
-if (userData) {
-
-document.getElementById(
-"welcome"
-).textContent =
-"Welcome to ShopBrain 👋";
-
-}
-
+  const userData = JSON.parse(user);
+  if (userData) {
+    // Prefer name, then email, then fallback to generic message.
+    const who = userData.name || userData.email || null;
+    if (who) {
+      document.getElementById("welcome").textContent = `Welcome, ${who} 👋`;
+    } else {
+      document.getElementById("welcome").textContent = "Welcome to ShopBrain 👋";
+    }
+  }
 } catch (error) {
-
-/*
-If the saved account isn't JSON,
-the dashboard still works.
-*/
-
+  // If saved account isn't JSON, keep the generic welcome but log the error for debugging.
+  console.error('Failed to parse shopbrainUser from localStorage:', error);
 }
 
-
 /*
-Check for existing AI.
+Check for existing AI and toggle UI accordingly.
 */
-
-const savedAgent =
-localStorage.getItem("shopbrainAgent");
-
+const savedAgent = localStorage.getItem("shopbrainAgent");
 
 if (savedAgent) {
+  // Reveal the "myAI" view and hide the create view.
+  document.getElementById("myAI").style.display = "block";
+  document.getElementById("createAI").style.display = "none";
 
-
-document.getElementById(
-"myAI"
-).style.display =
-"block";
-
-
-document.getElementById(
-"createAI"
-).style.display =
-"none";
-
-
-try {
-
-const agent =
-JSON.parse(savedAgent);
-
-
-if (agent.agentName) {
-
-document.getElementById(
-"agentName"
-).textContent =
-agent.agentName;
-
-}
-
-
-if (agent.businessName) {
-
-document.getElementById(
-"businessName"
-).textContent =
-agent.businessName;
-
-}
-
-} catch (error) {
-
-console.log(
-"Agent data loaded."
-);
-
-}
-
-
+  try {
+    const agent = JSON.parse(savedAgent);
+    if (agent.agentName) {
+      document.getElementById("agentName").textContent = agent.agentName;
+    }
+    if (agent.businessName) {
+      document.getElementById("businessName").textContent = agent.businessName;
+    }
+  } catch (error) {
+    // Parsing failed; log the actual error to help debugging.
+    console.error('Failed to parse shopbrainAgent from localStorage:', error);
+  }
 } else {
-
-
-document.getElementById(
-"createAI"
-).style.display =
-"block";
-
-
-document.getElementById(
-"myAI"
-).style.display =
-"none";
-
+  // No agent yet: show create card and keep myAI hidden.
+  document.getElementById("createAI").style.display = "block";
+  document.getElementById("myAI").style.display = "none";
 }
-
 
 /*
-Logout
+Logout: remove user and agent data and redirect.
 */
-
 function logout() {
-
-localStorage.removeItem(
-"shopbrainUser"
-);
-
-window.location.href =
-"index.html";
-
+  try {
+    localStorage.removeItem("shopbrainUser");
+    localStorage.removeItem("shopbrainAgent");
+  } catch (e) {
+    console.error('Error clearing localStorage during logout:', e);
+  }
+  window.location.href = "index.html";
 }
 
 </script>
