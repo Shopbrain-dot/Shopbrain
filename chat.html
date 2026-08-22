@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ShopBrain AI Chat</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f4f6;
+      color: #111827;
+    }
+
+    .chat-container {
+      max-width: 700px;
+      height: 100vh;
+      margin: auto;
+      background: white;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .header {
+      background: #111827;
+      color: white;
+      padding: 20px;
+    }
+
+    .header h2 {
+      margin-bottom: 5px;
+    }
+
+    .header p {
+      color: #d1d5db;
+      font-size: 14px;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 12px 15px;
+      margin-bottom: 12px;
+      border-radius: 12px;
+      line-height: 1.5;
+      white-space: pre-wrap;
+    }
+
+    .bot {
+      background: #f3f4f6;
+      margin-right: auto;
+    }
+
+    .user {
+      background: #2563eb;
+      color: white;
+      margin-left: auto;
+    }
+
+    .input-area {
+      display: flex;
+      gap: 10px;
+      padding: 15px;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .input-area input {
+      flex: 1;
+      padding: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+
+    .input-area button {
+      border: none;
+      background: #2563eb;
+      color: white;
+      padding: 0 20px;
+      border-radius: 10px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .input-area button:hover {
+      background: #1d4ed8;
+    }
+
+    @media (max-width: 600px) {
+      .chat-container {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="chat-container">
+
+  <div class="header">
+
+    <h2 id="agentName">
+      ShopBrain Assistant
+    </h2>
+
+    <p id="businessName">
+      AI Customer Support
+    </p>
+
+  </div>
+
+
+  <div
+    class="messages"
+    id="messages"
+  >
+
+    <div class="message bot">
+      Hello! 👋 How can I help you today?
+    </div>
+
+  </div>
+
+
+  <form
+    class="input-area"
+    id="chatForm"
+  >
+
+    <input
+      type="text"
+      id="userInput"
+      placeholder="Ask a question..."
+      autocomplete="off"
+      required
+    >
+
+    <button type="submit">
+      Send
+    </button>
+
+  </form>
+
+</div>
+
+
+<script>
+
+  // Get the AI agent information
+  const savedAgent =
+    localStorage.getItem("shopbrainAgent");
+
+  let agent = null;
+
+  if (savedAgent) {
+
+    agent = JSON.parse(savedAgent);
+
+    document.getElementById("agentName").textContent =
+      agent.agentName || "ShopBrain Assistant";
+
+    document.getElementById("businessName").textContent =
+      agent.businessName || "AI Customer Support";
+
+  }
+
+
+  const messages =
+    document.getElementById("messages");
+
+  const form =
+    document.getElementById("chatForm");
+
+  const input =
+    document.getElementById("userInput");
+
+
+  function addMessage(text, type) {
+
+    const message =
+      document.createElement("div");
+
+    message.className =
+      "message " + type;
+
+    message.textContent = text;
+
+    messages.appendChild(message);
+
+    messages.scrollTop =
+      messages.scrollHeight;
+  }
+
+
+  function getAnswer(question) {
+
+    if (!agent) {
+
+      return "This AI has not been configured yet.";
+
+    }
+
+    const q =
+      question.toLowerCase();
+
+
+    // Search FAQs
+    if (agent.faqs) {
+
+      const faqLines =
+        agent.faqs.split("\n");
+
+      for (let line of faqLines) {
+
+        const clean =
+          line.trim().toLowerCase();
+
+        if (
+          clean &&
+          q.includes(
+            clean
+              .replace("q:", "")
+              .replace("?", "")
+              .trim()
+          )
+        ) {
+
+          const index =
+            faqLines.indexOf(line);
+
+          if (
+            faqLines[index + 1]
+          ) {
+
+            return faqLines[index + 1]
+              .replace(/^a:\s*/i, "");
+
+          }
+
+        }
+
+      }
+
+    }
+
+
+    // Shipping
+    if (
+      q.includes("shipping") ||
+      q.includes("delivery") ||
+      q.includes("deliver")
+    ) {
+
+      if (agent.shipping) {
+
+        return agent.shipping;
+
+      }
+
+    }
+
+
+    // Refund
+    if (
+      q.includes("refund") ||
+      q.includes("return")
+    ) {
+
+      if (agent.refund) {
+
+        return agent.refund;
+
+      }
+
+    }
+
+
+    // Products
+    if (
+      q.includes("product") ||
+      q.includes("price") ||
+      q.includes("cost")
+    ) {
+
+      if (agent.products) {
+
+        return "Here is our product information:\n\n" +
+          agent.products;
+
+      }
+
+    }
+
+
+    // Business information
+    if (
+      q.includes("about") ||
+      q.includes("business") ||
+      q.includes("company")
+    ) {
+
+      if (agent.businessDescription) {
+
+        return agent.businessDescription;
+
+      }
+
+    }
+
+
+    return "I'm sorry, I don't have enough information to answer that question. Please contact the business directly for assistance.";
+
+  }
+
+
+  form.addEventListener(
+    "submit",
+    function(event) {
+
+      event.preventDefault();
+
+      const question =
+        input.value.trim();
+
+      if (!question) return;
+
+
+      addMessage(
+        question,
+        "user"
+      );
+
+      input.value = "";
+
+
+      setTimeout(function() {
+
+        const answer =
+          getAnswer(question);
+
+        addMessage(
+          answer,
+          "bot"
+        );
+
+      }, 500);
+
+    }
+  );
+
+</script>
+
+</body>
+</html>
