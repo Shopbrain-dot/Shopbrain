@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Test ShopBrain AI</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+}
+
+.header {
+  background: #111827;
+  color: white;
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logo span {
+  color: #3b82f6;
+}
+
+.back {
+  color: white;
+  text-decoration: none;
+}
+
+.chat {
+  max-width: 700px;
+  margin: 30px auto;
+  background: white;
+  height: 80vh;
+  border-radius: 15px;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-header {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.chat-header h2 {
+  margin: 0 0 5px;
+}
+
+.chat-header p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.message {
+  margin-bottom: 15px;
+  display: flex;
+}
+
+.message.user {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 75%;
+  padding: 12px 15px;
+  border-radius: 15px;
+  line-height: 1.5;
+}
+
+.ai .bubble {
+  background: #f3f4f6;
+}
+
+.user .bubble {
+  background: #2563eb;
+  color: white;
+}
+
+.input-area {
+  display: flex;
+  padding: 15px;
+  border-top: 1px solid #eee;
+  gap: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 0 20px;
+  font-weight: bold;
+}
+
+@media (max-width: 700px) {
+  .chat {
+    margin: 0;
+    width: 100%;
+    height: calc(100vh - 60px);
+    border-radius: 0;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+
+  <div class="logo">
+    Shop<span>Brain</span>
+  </div>
+
+  <a href="dashboard.html" class="back">
+    Dashboard
+  </a>
+
+</div>
+
+
+<div class="chat">
+
+  <div class="chat-header">
+
+    <h2 id="agentName">
+      ShopBrain AI
+    </h2>
+
+    <p id="businessName">
+      Customer Service Assistant
+    </p>
+
+  </div>
+
+
+  <div
+    class="messages"
+    id="messages"
+  ></div>
+
+
+  <div class="input-area">
+
+    <input
+      type="text"
+      id="userInput"
+      placeholder="Ask your AI something..."
+    >
+
+    <button id="sendButton">
+      Send
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* Get the saved AI */
+
+const savedAgent =
+  localStorage.getItem("shopbrainAgent");
+
+
+if (!savedAgent) {
+
+  window.location.href =
+    "agent.html";
+
+}
+
+
+const agent =
+  JSON.parse(savedAgent);
+
+
+/* Display AI information */
+
+document.getElementById(
+  "agentName"
+).textContent =
+  agent.agentName || "ShopBrain AI";
+
+
+document.getElementById(
+  "businessName"
+).textContent =
+  agent.businessName || "Customer Service";
+
+
+/* Chat elements */
+
+const messages =
+  document.getElementById("messages");
+
+const input =
+  document.getElementById("userInput");
+
+const sendButton =
+  document.getElementById("sendButton");
+
+
+/* Add message */
+
+function addMessage(text, type) {
+
+  const message =
+    document.createElement("div");
+
+  message.className =
+    "message " + type;
+
+
+  const bubble =
+    document.createElement("div");
+
+  bubble.className =
+    "bubble";
+
+
+  bubble.textContent =
+    text;
+
+
+  message.appendChild(bubble);
+
+  messages.appendChild(message);
+
+  messages.scrollTop =
+    messages.scrollHeight;
+}
+
+
+/* First message */
+
+addMessage(
+  "Hi! 👋 I'm " +
+  (agent.agentName || "your AI assistant") +
+  ". How can I help you today?",
+  "ai"
+);
+
+
+/*
+  Create an answer using
+  the business training.
+*/
+
+function getAIResponse(question) {
+
+  const q =
+    question.toLowerCase();
+
+
+  const business =
+    agent.businessName ||
+    "our business";
+
+
+  /*
+    Greeting
+  */
+
+  if (
+    q === "hi" ||
+    q === "hello" ||
+    q.includes("hey") ||
+    q.includes("good morning") ||
+    q.includes("good afternoon") ||
+    q.includes("good evening")
+  ) {
+
+    return (
+      "Hi! 👋 Welcome to " +
+      business +
+      ". How can I help you today?"
+    );
+
+  }
+
+
+  /*
+    Business information
+  */
+
+  if (
+    q.includes("what do you sell") ||
+    q.includes("what do you offer") ||
+    q.includes("your business")
+  ) {
+
+    return (
+      agent.businessDescription ||
+      "Please ask me about our products or services."
+    );
+
+  }
+
+
+  /*
+    Products
+  */
+
+  if (
+    q.includes("product") ||
+    q.includes("price") ||
+    q.includes("cost") ||
+    q.includes("how much")
+  ) {
+
+    if (agent.products) {
+
+      return (
+        "Here is our product information:\n\n" +
+        agent.products
+      );
+
+    }
+
+  }
+
+
+  /*
+    Shipping
+  */
+
+  if (
+    q.includes("shipping") ||
+    q.includes("delivery") ||
+    q.includes("deliver") ||
+    q.includes("how long")
+  ) {
+
+    if (agent.shipping) {
+
+      return (
+        "Here is our shipping information:\n\n" +
+        agent.shipping
+      );
+
+    }
+
+  }
+
+
+  /*
+    Refund
+  */
+
+  if (
+    q.includes("refund") ||
+    q.includes("return") ||
+    q.includes("exchange")
+  ) {
+
+    if (agent.refund) {
+
+      return (
+        "Here is our refund and return policy:\n\n" +
+        agent.refund
+      );
+
+    }
+
+  }
+
+
+  /*
+    FAQs
+  */
+
+  if (agent.faqs) {
+
+    const faqLines =
+      agent.faqs.split("\n");
+
+
+    for (
+      let i = 0;
+      i < faqLines.length;
+      i++
+    ) {
+
+      const line =
+        faqLines[i].toLowerCase();
+
+
+      const words =
+        q.split(" ");
+
+
+      let matches = 0;
+
+
+      words.forEach(function(word) {
+
+        if (
+          word.length > 3 &&
+          line.includes(word)
+        ) {
+
+          matches++;
+
+        }
+
+      });
+
+
+      if (matches >= 2) {
+
+        if (
+          faqLines[i + 1]
+        ) {
+
+          return faqLines[i + 1]
+            .replace(/^a:\s*/i, "");
+
+        }
+
+      }
+
+    }
+
+  }
+
+
+  /*
+    If there is no answer
+  */
+
+  return (
+    "I'm sorry, I don't have enough information " +
+    "to answer that yet. Please contact " +
+    business +
+    " for more help."
+  );
+
+}
+
+
+/* Send message */
+
+function sendMessage() {
+
+  const question =
+    input.value.trim();
+
+
+  if (!question) {
+    return;
+  }
+
+
+  addMessage(
+    question,
+    "user"
+  );
+
+
+  input.value = "";
+
+
+  /*
+    Small delay so it feels
+    like an AI is responding.
+  */
+
+  setTimeout(function() {
+
+    const answer =
+      getAIResponse(question);
+
+
+    addMessage(
+      answer,
+      "ai"
+    );
+
+  }, 500);
+
+}
+
+
+/* Button */
+
+sendButton.addEventListener(
+  "click",
+  sendMessage
+);
+
+
+/* Enter key */
+
+input.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (
+      event.key === "Enter"
+    ) {
+
+      sendMessage();
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
