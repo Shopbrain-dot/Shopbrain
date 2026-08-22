@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Train AI - ShopBrain</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+  color: #111827;
+}
+
+header {
+  background: #111827;
+  color: white;
+  padding: 18px;
+}
+
+.header {
+  max-width: 900px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logo span {
+  color: #3b82f6;
+}
+
+.back {
+  color: white;
+  text-decoration: none;
+}
+
+.container {
+  max-width: 900px;
+  margin: 35px auto;
+  padding: 20px;
+}
+
+.title {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.title h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+}
+
+.title p {
+  color: #6b7280;
+}
+
+.card {
+  background: white;
+  padding: 28px;
+  border-radius: 15px;
+  margin-bottom: 25px;
+  box-shadow: 0 5px 20px rgba(0,0,0,.05);
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  font-size: 15px;
+  margin-bottom: 15px;
+}
+
+textarea {
+  min-height: 170px;
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 9px;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.train-button {
+  background: #2563eb;
+}
+
+.website-button {
+  background: #16a34a;
+}
+
+button:hover {
+  opacity: .9;
+}
+
+.message {
+  display: none;
+  margin-top: 15px;
+  padding: 14px;
+  border-radius: 9px;
+  line-height: 1.5;
+}
+
+.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.info {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.knowledge {
+  background: #f9fafb;
+  padding: 18px;
+  border-radius: 10px;
+  white-space: pre-wrap;
+  line-height: 1.6;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.small {
+  color: #6b7280;
+  font-size: 13px;
+  margin-top: -5px;
+  margin-bottom: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="header">
+
+<div class="logo">
+Shop<span>Brain</span>
+</div>
+
+<a
+href="dashboard.html"
+class="back"
+>
+← Dashboard
+</a>
+
+</div>
+
+</header>
+
+
+<div class="container">
+
+
+<div class="title">
+
+<h1>🧠 Train Your AI</h1>
+
+<p>
+Train the same AI as many times as you want.
+</p>
+
+</div>
+
+
+<!-- WEBSITE TRAINING -->
+
+<div class="card">
+
+<h2>
+🌐 Train From Your Website
+</h2>
+
+<p>
+Paste your business website URL and ShopBrain
+will use the website information to train your AI.
+</p>
+
+<label>
+Website URL
+</label>
+
+<input
+type="url"
+id="websiteUrl"
+placeholder="https://yourbusiness.com"
+>
+
+<p class="small">
+Example: https://example.com
+</p>
+
+<button
+class="website-button"
+id="websiteButton"
+>
+🔍 Import Website
+</button>
+
+<div
+class="message info"
+id="websiteInfo"
+>
+Website importing will be connected to the
+ShopBrain website crawler backend next.
+</div>
+
+</div>
+
+
+<!-- MANUAL TRAINING -->
+
+<div class="card">
+
+<h2>
+✍️ Train Manually
+</h2>
+
+<p>
+Add information that your AI should know.
+You can do this unlimited times.
+</p>
+
+<label>
+New Training Information
+</label>
+
+<textarea
+id="training"
+placeholder="Example:
+
+Our new product is Samsung S25.
+Price: $799.
+
+We deliver worldwide.
+Delivery takes 3-5 business days.
+
+Customers can return products within 14 days."
+></textarea>
+
+<button
+class="train-button"
+id="trainButton"
+>
+🧠 Add Training
+</button>
+
+<div
+class="message success"
+id="success"
+>
+✅ New knowledge has been added to your AI!
+</div>
+
+</div>
+
+
+<!-- CURRENT KNOWLEDGE -->
+
+<div class="card">
+
+<h2>
+📚 AI Knowledge
+</h2>
+
+<div
+class="knowledge"
+id="knowledge"
+>
+Loading...
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/*
+==================================================
+CHECK ACCOUNT
+==================================================
+*/
+
+const user =
+localStorage.getItem(
+"shopbrainUser"
+);
+
+if (!user) {
+
+window.location.href =
+"signup.html";
+
+}
+
+
+/*
+==================================================
+LOAD AI
+==================================================
+*/
+
+const savedAgent =
+localStorage.getItem(
+"shopbrainAgent"
+);
+
+if (!savedAgent) {
+
+window.location.href =
+"agent.html";
+
+}
+
+const agent =
+JSON.parse(savedAgent);
+
+
+/*
+==================================================
+DISPLAY CURRENT KNOWLEDGE
+==================================================
+*/
+
+function displayKnowledge() {
+
+let text = "";
+
+
+if (agent.businessDescription) {
+
+text +=
+"BUSINESS\n\n" +
+agent.businessDescription +
+"\n\n";
+
+}
+
+
+if (agent.products) {
+
+text +=
+"PRODUCTS & SERVICES\n\n" +
+agent.products +
+"\n\n";
+
+}
+
+
+if (agent.shipping) {
+
+text +=
+"SHIPPING\n\n" +
+agent.shipping +
+"\n\n";
+
+}
+
+
+if (agent.refund) {
+
+text +=
+"REFUNDS & RETURNS\n\n" +
+agent.refund +
+"\n\n";
+
+}
+
+
+if (agent.faqs) {
+
+text +=
+"FAQs\n\n" +
+agent.faqs +
+"\n\n";
+
+}
+
+
+if (agent.training) {
+
+text +=
+"ADDITIONAL TRAINING\n\n" +
+agent.training +
+"\n\n";
+
+}
+
+
+if (agent.websiteKnowledge) {
+
+text +=
+"WEBSITE KNOWLEDGE\n\n" +
+agent.websiteKnowledge;
+
+}
+
+
+if (!text.trim()) {
+
+document.getElementById(
+"knowledge"
+).textContent =
+"No training information yet.";
+
+} else {
+
+document.getElementById(
+"knowledge"
+).textContent =
+text;
+
+}
+
+}
+
+
+displayKnowledge();
+
+
+/*
+==================================================
+MANUAL TRAINING
+==================================================
+*/
+
+document
+.getElementById("trainButton")
+.addEventListener(
+"click",
+function() {
+
+const newTraining =
+document.getElementById(
+"training"
+).value.trim();
+
+
+if (!newTraining) {
+
+alert(
+"Please enter information to train your AI."
+);
+
+return;
+
+}
+
+
+if (agent.training) {
+
+agent.training +=
+"\n\n--- NEW TRAINING ---\n\n" +
+newTraining;
+
+} else {
+
+agent.training =
+newTraining;
+
+}
+
+
+localStorage.setItem(
+"shopbrainAgent",
+JSON.stringify(agent)
+);
+
+
+document.getElementById(
+"training"
+).value =
+"";
+
+
+document.getElementById(
+"success"
+).style.display =
+"block";
+
+
+displayKnowledge();
+
+
+setTimeout(
+function() {
+
+document.getElementById(
+"success"
+).style.display =
+"none";
+
+},
+3000
+);
+
+});
+
+
+/*
+==================================================
+WEBSITE IMPORT
+==================================================
+*/
+
+document
+.getElementById("websiteButton")
+.addEventListener(
+"click",
+function() {
+
+const url =
+document.getElementById(
+"websiteUrl"
+).value.trim();
+
+
+if (!url) {
+
+alert(
+"Please enter your website URL."
+);
+
+return;
+
+}
+
+
+try {
+
+new URL(url);
+
+} catch (error) {
+
+alert(
+"Please enter a valid website URL."
+);
+
+return;
+
+}
+
+
+/*
+Currently this is the UI.
+The real crawler will be connected
+through the backend.
+*/
+
+document.getElementById(
+"websiteInfo"
+).style.display =
+"block";
+
+
+});
+
+</script>
+
+</body>
+</html>
