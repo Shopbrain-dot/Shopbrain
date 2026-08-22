@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>ShopBrain Dashboard</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #111827;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 20px;
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .logo span {
+      color: #3b82f6;
+    }
+
+    .logout {
+      background: #dc2626;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 35px auto;
+      padding: 0 20px;
+    }
+
+    .welcome {
+      margin-bottom: 30px;
+    }
+
+    .welcome h1 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    .welcome p {
+      color: #6b7280;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stat {
+      background: white;
+      padding: 25px;
+      border-radius: 14px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .stat p {
+      color: #6b7280;
+      margin-bottom: 10px;
+    }
+
+    .stat h2 {
+      font-size: 28px;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 14px;
+      margin-bottom: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .card h2 {
+      margin-bottom: 10px;
+    }
+
+    .card p {
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .button {
+      display: inline-block;
+      background: #2563eb;
+      color: white;
+      padding: 14px 20px;
+      border-radius: 9px;
+      text-decoration: none;
+      font-weight: bold;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+
+    .button:hover {
+      background: #1d4ed8;
+    }
+
+    .secondary {
+      background: #111827;
+    }
+
+    .secondary:hover {
+      background: #1f2937;
+    }
+
+    .agent-status {
+      padding: 12px;
+      background: #f3f4f6;
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+
+    .active {
+      color: #16a34a;
+      font-weight: bold;
+    }
+
+    @media (max-width: 700px) {
+
+      .stats {
+        grid-template-columns: 1fr;
+      }
+
+      .header-inner {
+        gap: 15px;
+      }
+
+      .welcome h1 {
+        font-size: 25px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+
+  <div class="header-inner">
+
+    <div class="logo">
+      Shop<span>Brain</span>
+    </div>
+
+    <button
+      class="logout"
+      id="logoutButton"
+    >
+      Logout
+    </button>
+
+  </div>
+
+</header>
+
+
+<div class="container">
+
+  <div class="welcome">
+
+    <h1 id="welcomeText">
+      Welcome to ShopBrain
+    </h1>
+
+    <p>
+      Manage your AI customer-service agent.
+    </p>
+
+  </div>
+
+
+  <div class="stats">
+
+    <div class="stat">
+
+      <p>AI Agents</p>
+
+      <h2 id="agentCount">
+        0
+      </h2>
+
+    </div>
+
+
+    <div class="stat">
+
+      <p>Conversations</p>
+
+      <h2>
+        0
+      </h2>
+
+    </div>
+
+
+    <div class="stat">
+
+      <p>AI Status</p>
+
+      <h2 class="active">
+        Active
+      </h2>
+
+    </div>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>
+      🤖 Your AI Customer-Service Agent
+    </h2>
+
+    <p id="agentInfo">
+      You haven't created an AI agent yet.
+    </p>
+
+    <div
+      class="agent-status"
+      id="agentStatus"
+    >
+      Status: Not created
+    </div>
+
+    <a
+      href="agent.html"
+      class="button"
+    >
+      + Create AI Agent
+    </a>
+
+    <a
+      href="chat.html"
+      class="button secondary"
+    >
+      💬 Test AI
+    </a>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>
+      📚 Train Your AI
+    </h2>
+
+    <p>
+      Teach your AI about your products, FAQs,
+      shipping information, refund policies and
+      business rules.
+    </p>
+
+    <a
+      href="agent.html"
+      class="button"
+    >
+      Train Your AI
+    </a>
+
+  </div>
+
+
+  <div class="card">
+
+    <h2>
+      ⚙️ Settings
+    </h2>
+
+    <p>
+      Manage your ShopBrain account and AI settings.
+    </p>
+
+    <a
+      href="settings.html"
+      class="button secondary"
+    >
+      Open Settings
+    </a>
+
+  </div>
+
+</div>
+
+
+<script>
+
+  // Get the saved account
+
+  const savedUser =
+    localStorage.getItem("shopbrainUser");
+
+
+  if (savedUser) {
+
+    const user =
+      JSON.parse(savedUser);
+
+    document.getElementById(
+      "welcomeText"
+    ).textContent =
+      "Welcome, " + (user.name || "Business Owner");
+
+  }
+
+
+  // Get saved AI agent
+
+  const savedAgent =
+    localStorage.getItem("shopbrainAgent");
+
+
+  if (savedAgent) {
+
+    const agent =
+      JSON.parse(savedAgent);
+
+
+    document.getElementById(
+      "agentCount"
+    ).textContent = "1";
+
+
+    document.getElementById(
+      "agentInfo"
+    ).textContent =
+      "Your AI agent \"" +
+      (agent.agentName || "ShopBrain Assistant") +
+      "\" has been created for " +
+      (agent.businessName || "your business") +
+      ".";
+
+
+    document.getElementById(
+      "agentStatus"
+    ).innerHTML =
+      "Status: <span class='active'>Ready</span>";
+
+  }
+
+
+  // Logout
+
+  document
+    .getElementById("logoutButton")
+    .addEventListener("click", function() {
+
+      localStorage.removeItem(
+        "shopbrainLoggedIn"
+      );
+
+      window.location.href =
+        "index.html";
+
+    });
+
+</script>
+
+</body>
+</html>
