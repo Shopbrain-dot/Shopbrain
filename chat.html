@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ShopBrain AI</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+}
+
+.header {
+  background: #111827;
+  color: white;
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logo span {
+  color: #3b82f6;
+}
+
+.back {
+  color: white;
+  text-decoration: none;
+}
+
+.chat {
+  max-width: 750px;
+  margin: 30px auto;
+  background: white;
+  height: 80vh;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 25px rgba(0,0,0,.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.chat-header h2 {
+  margin: 0 0 5px;
+}
+
+.chat-header p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.message.user {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 80%;
+  padding: 13px 16px;
+  border-radius: 15px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.ai .bubble {
+  background: #f3f4f6;
+}
+
+.user .bubble {
+  background: #2563eb;
+  color: white;
+}
+
+.input-area {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  border-top: 1px solid #eee;
+}
+
+input {
+  flex: 1;
+  padding: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  font-size: 15px;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 9px;
+  padding: 0 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+
+  <div class="logo">
+    Shop<span>Brain</span>
+  </div>
+
+  <a
+    href="dashboard.html"
+    class="back"
+  >
+    ← Dashboard
+  </a>
+
+</div>
+
+
+<div class="chat">
+
+  <div class="chat-header">
+
+    <h2 id="agentName">
+      ShopBrain AI
+    </h2>
+
+    <p id="businessName">
+      Customer Service Assistant
+    </p>
+
+  </div>
+
+
+  <div
+    class="messages"
+    id="messages"
+  ></div>
+
+
+  <div class="input-area">
+
+    <input
+      id="userInput"
+      type="text"
+      placeholder="Ask your AI..."
+    >
+
+    <button
+      id="sendButton"
+    >
+      Send
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/*
+========================================
+LOAD ACCOUNT
+========================================
+*/
+
+const user =
+localStorage.getItem("shopbrainUser");
+
+if (!user) {
+
+  window.location.href =
+    "signup.html";
+
+}
+
+
+/*
+========================================
+LOAD AI
+========================================
+*/
+
+const savedAgent =
+localStorage.getItem("shopbrainAgent");
+
+
+if (!savedAgent) {
+
+  window.location.href =
+    "agent.html";
+
+}
+
+
+/*
+Convert saved data safely
+*/
+
+let agent = {};
+
+try {
+
+  agent =
+    JSON.parse(savedAgent);
+
+} catch (error) {
+
+  agent = {};
+
+}
+
+
+/*
+========================================
+DISPLAY AI
+========================================
+*/
+
+document.getElementById(
+  "agentName"
+).textContent =
+  agent.agentName ||
+  "ShopBrain AI";
+
+
+document.getElementById(
+  "businessName"
+).textContent =
+  agent.businessName ||
+  "Customer Service Assistant";
+
+
+/*
+========================================
+CHAT
+========================================
+*/
+
+const messages =
+  document.getElementById(
+    "messages"
+  );
+
+const input =
+  document.getElementById(
+    "userInput"
+  );
+
+const sendButton =
+  document.getElementById(
+    "sendButton"
+  );
+
+
+function addMessage(
+  text,
+  type
+) {
+
+  const row =
+    document.createElement(
+      "div"
+    );
+
+  row.className =
+    "message " + type;
+
+
+  const bubble =
+    document.createElement(
+      "div"
+    );
+
+  bubble.className =
+    "bubble";
+
+  bubble.textContent =
+    text;
+
+
+  row.appendChild(
+    bubble
+  );
+
+  messages.appendChild(
+    row
+  );
+
+
+  messages.scrollTop =
+    messages.scrollHeight;
+
+}
+
+
+/*
+========================================
+WELCOME
+========================================
+*/
+
+addMessage(
+  "Hi! 👋 I'm " +
+  (agent.agentName || "your ShopBrain AI") +
+  ". How can I help you?",
+  "ai"
+);
+
+
+/*
+========================================
+GET ALL KNOWLEDGE
+========================================
+*/
+
+function getKnowledge() {
+
+  let knowledge = "";
+
+
+  if (agent.businessDescription) {
+
+    knowledge +=
+      "\n" +
+      agent.businessDescription;
+
+  }
+
+
+  if (agent.products) {
+
+    knowledge +=
+      "\n" +
+      agent.products;
+
+  }
+
+
+  if (agent.shipping) {
+
+    knowledge +=
+      "\n" +
+      agent.shipping;
+
+  }
+
+
+  if (agent.refund) {
+
+    knowledge +=
+      "\n" +
+      agent.refund;
+
+  }
+
+
+  if (agent.faqs) {
+
+    knowledge +=
+      "\n" +
+      agent.faqs;
+
+  }
+
+
+  if (agent.training) {
+
+    knowledge +=
+      "\n" +
+      agent.training;
+
+  }
+
+
+  if (agent.websiteKnowledge) {
+
+    knowledge +=
+      "\n" +
+      agent.websiteKnowledge;
+
+  }
+
+
+  return knowledge.trim();
+
+}
+
+
+/*
+========================================
+ANSWER
+========================================
+*/
+
+function answerQuestion(question) {
+
+  const q =
+    question.toLowerCase();
+
+
+  /*
+  Greetings
+  */
+
+  if (
+    q === "hi" ||
+    q === "hello" ||
+    q === "hey"
+  ) {
+
+    return (
+      "Hi! 👋 Welcome to " +
+      (agent.businessName ||
+       "our business") +
+      ". How can I help you?"
+    );
+
+  }
+
+
+  /*
+  Shipping
+  */
+
+  if (
+    q.includes("shipping") ||
+    q.includes("delivery")
+  ) {
+
+    if (agent.shipping) {
+
+      return (
+        "Here is our shipping information:\n\n" +
+        agent.shipping
+      );
+
+    }
+
+  }
+
+
+  /*
+  Refund
+  */
+
+  if (
+    q.includes("refund") ||
+    q.includes("return")
+  ) {
+
+    if (agent.refund) {
+
+      return (
+        "Here is our return/refund information:\n\n" +
+        agent.refund
+      );
+
+    }
+
+  }
+
+
+  /*
+  Products
+  */
+
+  if (
+    q.includes("product") ||
+    q.includes("price") ||
+    q.includes("cost")
+  ) {
+
+    if (agent.products) {
+
+      return (
+        "Here is our product information:\n\n" +
+        agent.products
+      );
+
+    }
+
+  }
+
+
+  /*
+  Search all knowledge
+  */
+
+  const knowledge =
+    getKnowledge();
+
+
+  const words =
+    q.split(/\s+/)
+      .filter(
+        word => word.length > 2
+      );
+
+
+  const matches =
+    words.filter(
+      word =>
+        knowledge
+          .toLowerCase()
+          .includes(word)
+    );
+
+
+  if (matches.length > 0) {
+
+    return (
+      "Based on my training:\n\n" +
+      knowledge.substring(
+        0,
+        1500
+      )
+    );
+
+  }
+
+
+  return (
+    "I don't have that information yet. " +
+    "Please train me with the answer and " +
+    "I'll learn it."
+  );
+
+}
+
+
+/*
+========================================
+SEND
+========================================
+*/
+
+function sendMessage() {
+
+  const question =
+    input.value.trim();
+
+
+  if (!question) {
+    return;
+  }
+
+
+  addMessage(
+    question,
+    "user"
+  );
+
+
+  input.value = "";
+
+
+  setTimeout(
+    function() {
+
+      const answer =
+        answerQuestion(
+          question
+        );
+
+
+      addMessage(
+        answer,
+        "ai"
+      );
+
+    },
+    300
+  );
+
+}
+
+
+sendButton.addEventListener(
+  "click",
+  sendMessage
+);
+
+
+input.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (
+      event.key === "Enter"
+    ) {
+
+      sendMessage();
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
