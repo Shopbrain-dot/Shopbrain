@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up - ShopBrain</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 450px;
+      background: white;
+      padding: 35px;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .logo span {
+      color: #2563eb;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 30px;
+      line-height: 1.5;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 9px;
+      margin-bottom: 18px;
+      font-size: 15px;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #2563eb;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 9px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+
+    .message {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 8px;
+      line-height: 1.5;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .login {
+      text-align: center;
+      margin-top: 20px;
+      color: #6b7280;
+    }
+
+    .login a {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <div class="logo">
+      Shop<span>Brain</span>
+    </div>
+
+    <p class="subtitle">
+      Create your ShopBrain account and start
+      building your AI customer-service agent.
+    </p>
+
+    <form id="signupForm">
+
+      <label for="name">Your Name</label>
+
+      <input
+        type="text"
+        id="name"
+        placeholder="Your name"
+        required
+      >
+
+      <label for="business">Business Name</label>
+
+      <input
+        type="text"
+        id="business"
+        placeholder="Your business name"
+        required
+      >
+
+      <label for="email">Email Address</label>
+
+      <input
+        type="email"
+        id="email"
+        placeholder="you@example.com"
+        required
+      >
+
+      <label for="password">Password</label>
+
+      <input
+        type="password"
+        id="password"
+        placeholder="At least 6 characters"
+        minlength="6"
+        required
+      >
+
+      <button type="submit" id="signupButton">
+        Create Account
+      </button>
+
+      <div class="message error" id="errorMessage"></div>
+
+      <div class="message success" id="successMessage">
+        Account created successfully! Redirecting...
+      </div>
+
+    </form>
+
+    <div class="login">
+      Already have an account?
+      <a href="login.html">Login</a>
+    </div>
+
+  </div>
+
+  <!-- IMPORTANT: Supabase library MUST load first -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Your Supabase configuration -->
+  <script src="supabase-config.js"></script>
+
+  <script>
+    const signupForm = document.getElementById("signupForm");
+    const signupButton = document.getElementById("signupButton");
+    const errorMessage = document.getElementById("errorMessage");
+    const successMessage = document.getElementById("successMessage");
+
+    signupForm.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      errorMessage.style.display = "none";
+      successMessage.style.display = "none";
+
+      const name = document.getElementById("name").value.trim();
+      const business = document.getElementById("business").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (password.length < 6) {
+        errorMessage.textContent =
+          "Password must be at least 6 characters.";
+        errorMessage.style.display = "block";
+        return;
+      }
+
+      signupButton.disabled = true;
+      signupButton.textContent = "Creating account...";
+
+      try {
+        const { data, error } =
+          await supabaseClient.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+              data: {
+                name: name,
+                business_name: business
+              }
+            }
+          });
+
+        if (error) {
+          throw error;
+        }
+
+        successMessage.textContent =
+          "✅ Account created successfully! Redirecting...";
+
+        successMessage.style.display = "block";
+
+        setTimeout(function() {
+          window.location.href = "dashboard.html";
+        }, 1500);
+
+      } catch (error) {
+        console.error("Signup error:", error);
+
+        errorMessage.textContent =
+          error.message || "Could not create account.";
+
+        errorMessage.style.display = "block";
+
+        signupButton.disabled = false;
+        signupButton.textContent = "Create Account";
+      }
+    });
+  </script>
+
+</body>
+</html>
