@@ -1,6 +1,6 @@
 const SUPABASE_URL = "https://eaefuwdtscpjkzsnctrr.supabase.co";
 
-const SUPABASE_ANON_KEY = "PASTE_THE_CURRENT_PUBLISHABLE_KEY_HERE";
+const eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVhZWZ1d2R0c2Nwamt6c25jdHJyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcyOTcxNDYsImV4cCI6MjEwMjg3MzE0Nn0.AYGuDvMbszqWFoTZA80MhPOuYH7va727OjFqSZZ3Qmo
 
 const supabaseClient = window.supabase.createClient(
   SUPABASE_URL,
