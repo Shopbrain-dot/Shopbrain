@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Create AI - ShopBrain</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+  color: #111827;
+}
+
+header {
+  background: #111827;
+  color: white;
+  padding: 18px;
+}
+
+.header {
+  max-width: 900px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logo span {
+  color: #3b82f6;
+}
+
+.back {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.container {
+  max-width: 720px;
+  margin: 45px auto;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.07);
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 28px;
+}
+
+.subtitle {
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 30px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: Arial, sans-serif;
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+}
+
+button {
+  width: 100%;
+  margin-top: 28px;
+  padding: 15px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.message {
+  display: none;
+  padding: 14px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  line-height: 1.5;
+}
+
+.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.info {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.section-title {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="header">
+
+    <div class="logo">
+      Shop<span>Brain</span>
+    </div>
+
+    <a href="dashboard.html" class="back">
+      ← Dashboard
+    </a>
+
+  </div>
+</header>
+
+<main class="container">
+
+  <div class="card">
+
+    <h1>🤖 Create Your AI Agent</h1>
+
+    <p class="subtitle">
+      Build your ShopBrain customer-service AI.
+      Add your business information so your AI can
+      answer customer questions accurately.
+    </p>
+
+    <div id="loadingMessage" class="message info">
+      Checking your account...
+    </div>
+
+    <div id="infoMessage" class="message info"></div>
+
+    <div id="errorMessage" class="message error"></div>
+
+    <div id="successMessage" class="message success"></div>
+
+    <form id="agentForm" class="hidden">
+
+      <label for="agentName">
+        AI Agent Name
+      </label>
+
+      <input
+        id="agentName"
+        type="text"
+        placeholder="Example: Shop Assistant"
+        required
+      >
+
+      <label for="businessName">
+        Business Name
+      </label>
+
+      <input
+        id="businessName"
+        type="text"
+        placeholder="Example: Shopora Market Hub"
+        required
+      >
+
+      <label for="businessDescription">
+        About Your Business
+      </label>
+
+      <textarea
+        id="businessDescription"
+        placeholder="Tell your AI about your business..."
+      ></textarea>
+
+      <h2 class="section-title">
+        📦 Products & Services
+      </h2>
+
+      <textarea
+        id="products"
+        placeholder="Example:
+
+Wireless Earbuds - $29
+Smart Watch - $49
+Phone Cases - $15"
+      ></textarea>
+
+      <h2 class="section-title">
+        🚚 Shipping Information
+      </h2>
+
+      <textarea
+        id="shipping"
+        placeholder="Example:
+
+We deliver worldwide.
+Delivery takes 3-5 business days."
+      ></textarea>
+
+      <h2 class="section-title">
+        🔄 Refund & Return Policy
+      </h2>
+
+      <textarea
+        id="refund"
+        placeholder="Example:
+
+Customers can return unused products within 14 days."
+      ></textarea>
+
+      <h2 class="section-title">
+        ❓ Frequently Asked Questions
+      </h2>
+
+      <textarea
+        id="faqs"
+        placeholder="Example:
+
+Q: Do you deliver internationally?
+A: Yes, we deliver worldwide."
+      ></textarea>
+
+      <button type="submit" id="createButton">
+        🚀 Create AI Agent
+      </button>
+
+    </form>
+
+  </div>
+
+</main>
+
+<script type="module">
+
+import { db } from "./firebase-config.js";
+
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+
+/* ================================
+   SUPABASE AUTH
+================================ */
+
+const SUPABASE_URL =
+  "https://eaefuwdtscpjkzsnctrr.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFub24iLCJpYXQiOjE3ODcyOTcxNDYsImV4cCI6MjEwMjg3MzE0Nn0.AYGuDvMbszqWFoTZA80MhPOuYH7va727OjFqSZZ3Qmo";
+
+
+let supabase = null;
+
+if (window.supabase) {
+
+  supabase =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY
+    );
+
+}
+
+
+/* ================================
+   ELEMENTS
+================================ */
+
+const form =
+  document.getElementById("agentForm");
+
+const loading =
+  document.getElementById("loadingMessage");
+
+const errorMessage =
+  document.getElementById("errorMessage");
+
+const successMessage =
+  document.getElementById("successMessage");
+
+const infoMessage =
+  document.getElementById("infoMessage");
+
+const createButton =
+  document.getElementById("createButton");
+
+
+/* ================================
+   MESSAGES
+================================ */
+
+function hideMessages() {
+
+  loading.style.display = "none";
+  errorMessage.style.display = "none";
+  successMessage.style.display = "none";
+  infoMessage.style.display = "none";
+
+}
+
+function showError(message) {
+
+  hideMessages();
+
+  errorMessage.textContent = message;
+
+  errorMessage.style.display = "block";
+
+}
+
+function showSuccess(message) {
+
+  hideMessages();
+
+  successMessage.textContent = message;
+
+  successMessage.style.display = "block";
+
+}
+
+function showInfo(message) {
+
+  hideMessages();
+
+  infoMessage.textContent = message;
+
+  infoMessage.style.display = "block";
+
+}
+
+
+/* ================================
+   GET LOGGED-IN USER
+================================ */
+
+async function getCurrentUser() {
+
+  try {
+
+    if (supabase) {
+
+      const result =
+        await supabase.auth.getSession();
+
+      if (
+        result.data &&
+        result.data.session &&
+        result.data.session.user
+      ) {
+
+        return result.data.session.user;
+
+      }
+
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Supabase session error:",
+      error
+    );
+
+  }
+
+
+  /*
+  Compatibility with your existing
+  ShopBrain account.
+  */
+
+  const savedUser =
+    localStorage.getItem(
+      "shopbrainUser"
+    );
+
+  if (savedUser) {
+
+    try {
+
+      const user =
+        JSON.parse(savedUser);
+
+      return {
+
+        id:
+          user.id ||
+          user.email ||
+          "local-user",
+
+        email:
+          user.email || ""
+
+      };
+
+    } catch (error) {
+
+      console.error(error);
+
+    }
+
+  }
+
+
+  return null;
+
+}
+
+
+/* ================================
+   CHECK EXISTING AGENT
+================================ */
+
+async function checkExistingAgent(user) {
+
+  try {
+
+    const agentsRef =
+      collection(
+        db,
+        "agents"
+      );
+
+    const agentQuery =
+      query(
+        agentsRef,
+        where(
+          "userId",
+          "==",
+          String(user.id)
+        )
+      );
+
+    const snapshot =
+      await getDocs(agentQuery);
+
+    if (!snapshot.empty) {
+
+      form.classList.add(
+        "hidden"
+      );
+
+      showInfo(
+        "You already have a ShopBrain AI agent. You can train your existing AI from your dashboard."
+      );
+
+      return true;
+
+    }
+
+    hideMessages();
+
+    form.classList.remove(
+      "hidden"
+    );
+
+    return false;
+
+  } catch (error) {
+
+    console.error(
+      "Firebase error:",
+      error
+    );
+
+    showError(
+      "Could not check your existing AI agent. Please check that Firestore is enabled and try again."
+    );
+
+    return false;
+
+  }
+
+}
+
+
+/* ================================
+   START PAGE
+================================ */
+
+async function start() {
+
+  loading.style.display =
+    "block";
+
+  const user =
+    await getCurrentUser();
+
+  if (!user) {
+
+    window.location.href =
+      "signup.html";
+
+    return;
+
+  }
+
+  await checkExistingAgent(user);
+
+}
+
+start();
+
+
+/* ================================
+   CREATE AGENT
+================================ */
+
+form.addEventListener(
+  "submit",
+  async function(event) {
+
+    event.preventDefault();
+
+    const user =
+      await getCurrentUser();
+
+    if (!user) {
+
+      window.location.href =
+        "signup.html";
+
+      return;
+
+    }
+
+
+    const agentName =
+      document
+        .getElementById("agentName")
+        .value
+        .trim();
+
+    const businessName =
+      document
+        .getElementById("businessName")
+        .value
+        .trim();
+
+    const businessDescription =
+      document
+        .getElementById("businessDescription")
+        .value
+        .trim();
+
+    const products =
+      document
+        .getElementById("products")
+        .value
+        .trim();
+
+    const shipping =
+      document
+        .getElementById("shipping")
+        .value
+        .trim();
+
+    const refund =
+      document
+        .getElementById("refund")
+        .value
+        .trim();
+
+    const faqs =
+      document
+        .getElementById("faqs")
+        .value
+        .trim();
+
+
+    if (!agentName) {
+
+      showError(
+        "Please enter a name for your AI agent."
+      );
+
+      return;
+
+    }
+
+
+    if (!businessName) {
+
+      showError(
+        "Please enter your business name."
+      );
+
+      return;
+
+    }
+
+
+    createButton.disabled =
+      true;
+
+    createButton.textContent =
+      "Creating your AI...";
+
+
+    try {
+
+      /*
+      CREATE AGENT
+      */
+
+      const agentRef =
+        await addDoc(
+          collection(
+            db,
+            "agents"
+          ),
+          {
+
+            userId:
+              String(user.id),
+
+            userEmail:
+              user.email || "",
+
+            name:
+              agentName,
+
+            businessName:
+              businessName,
+
+            welcomeMessage:
+              "Hi! How can I help you today?",
+
+            businessDescription:
+              businessDescription,
+
+            createdAt:
+              serverTimestamp()
+
+          }
+        );
+
+
+      /*
+      CREATE KNOWLEDGE
+      */
+
+      const knowledgeItems = [
+
+        {
+          type: "business",
+          title: "About the Business",
+          content:
+            businessDescription
+        },
+
+        {
+          type: "products",
+          title: "Products and Services",
+          content:
+            products
+        },
+
+        {
+          type: "shipping",
+          title: "Shipping Information",
+          content:
+            shipping
+        },
+
+        {
+          type: "refund",
+          title: "Refund and Return Policy",
+          content:
+            refund
+        },
+
+        {
+          type: "faq",
+          title: "Frequently Asked Questions",
+          content:
+            faqs
+        }
+
+      ];
+
+
+      for (
+        const item of knowledgeItems
+      ) {
+
+        if (!item.content) {
+
+          continue;
+
+        }
+
+        await addDoc(
+          collection(
+            db,
+            "knowledge"
+          ),
+          {
+
+            agentId:
+              agentRef.id,
+
+            userId:
+              String(user.id),
+
+            type:
+              item.type,
+
+            title:
+              item.title,
+
+            content:
+              item.content,
+
+            createdAt:
+              serverTimestamp()
+
+          }
+        );
+
+      }
+
+
+      /*
+      COMPATIBILITY WITH DASHBOARD
+      */
+
+      localStorage.setItem(
+        "shopbrainAgent",
+        JSON.stringify({
+
+          id:
+            agentRef.id,
+
+          agentName:
+            agentName,
+
+          businessName:
+            businessName
+
+        })
+      );
+
+
+      showSuccess(
+        "✅ Your AI agent has been created successfully! Redirecting..."
+      );
+
+
+      form.classList.add(
+        "hidden"
+      );
+
+
+      setTimeout(
+        function() {
+
+          window.location.href =
+            "dashboard.html";
+
+        },
+        1500
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Create AI error:",
+        error
+      );
+
+      showError(
+        "Could not create your AI agent. Please check your Firestore settings and try again."
+      );
+
+      createButton.disabled =
+        false;
+
+      createButton.textContent =
+        "🚀 Create AI Agent";
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
