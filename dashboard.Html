@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>ShopBrain Dashboard</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+  color: #111827;
+}
+
+header {
+  background: #111827;
+  color: white;
+  padding: 18px;
+}
+
+.header {
+  max-width: 1000px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logo span {
+  color: #3b82f6;
+}
+
+.logout {
+  background: #dc2626;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 7px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.logout:hover {
+  background: #b91c1c;
+}
+
+.container {
+  max-width: 1000px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.welcome {
+  margin-bottom: 30px;
+}
+
+.welcome h1 {
+  font-size: 30px;
+  margin-bottom: 10px;
+}
+
+.welcome p {
+  color: #6b7280;
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 15px;
+  margin-bottom: 25px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+}
+
+.card h2 {
+  margin-top: 0;
+}
+
+.agent-info {
+  background: #f3f4f6;
+  padding: 20px;
+  border-radius: 10px;
+  margin: 20px 0;
+}
+
+.status {
+  color: #16a34a;
+  font-weight: bold;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.button {
+  display: inline-block;
+  text-decoration: none;
+  color: white;
+  background: #2563eb;
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-weight: bold;
+}
+
+.button:hover {
+  opacity: 0.9;
+}
+
+.green {
+  background: #16a34a;
+}
+
+.dark {
+  background: #111827;
+}
+
+.orange {
+  background: #ea580c;
+}
+
+#createAI {
+  display: none;
+}
+
+#myAI {
+  display: none;
+}
+
+.loading {
+  text-align: center;
+  padding: 50px 20px;
+  color: #6b7280;
+}
+
+.error {
+  background: #fee2e2;
+  color: #991b1b;
+  padding: 15px;
+  border-radius: 10px;
+  display: none;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<div class="header">
+
+<div class="logo">
+Shop<span>Brain</span>
+</div>
+
+<button
+class="logout"
+id="logoutButton"
+>
+Logout
+</button>
+
+</div>
+
+</header>
+
+
+<main class="container">
+
+<div
+class="loading"
+id="loading"
+>
+Checking your ShopBrain account...
+</div>
+
+
+<div
+class="error"
+id="error"
+></div>
+
+
+<div
+id="dashboardContent"
+style="display:none;"
+>
+
+
+<div class="welcome">
+
+<h1 id="welcome">
+Welcome to ShopBrain 👋
+</h1>
+
+<p>
+Manage your customer-service AI from here.
+</p>
+
+</div>
+
+
+<!-- CREATE AI -->
+
+<div
+class="card"
+id="createAI"
+>
+
+<h2>
+🤖 Create Your AI
+</h2>
+
+<p>
+Create your customer-service AI agent.
+Each account can create only one AI.
+</p>
+
+<a
+href="agent.html"
+class="button"
+>
+🚀 Create AI Agent
+</a>
+
+</div>
+
+
+<!-- EXISTING AI -->
+
+<div
+class="card"
+id="myAI"
+>
+
+<h2>
+🤖 Your AI Agent
+</h2>
+
+<div class="agent-info">
+
+<h3 id="agentName">
+ShopBrain Assistant
+</h3>
+
+<p>
+Business:
+<strong id="businessName">
+Your Business
+</strong>
+</p>
+
+<p>
+Status:
+<span class="status">
+● Active
+</span>
+</p>
+
+</div>
+
+
+<div class="buttons">
+
+<a
+href="train.html"
+class="button green"
+>
+🧠 Train AI
+</a>
+
+<a
+href="chat.html"
+class="button"
+>
+💬 Test AI
+</a>
+
+<a
+href="manage.html"
+class="button dark"
+>
+⚙️ Manage AI
+</a>
+
+<a
+href="connect.html"
+class="button orange"
+>
+🔗 Connect Website
+</a>
+
+</div>
+
+</div>
+
+
+<!-- HELP -->
+
+<div class="card">
+
+<h2>
+📚 How ShopBrain Works
+</h2>
+
+<p>
+Create one AI agent for your business.
+Then train that same AI as many times as you want.
+</p>
+
+<p>
+You can add products, prices, FAQs, delivery
+information, refund policies and other business
+knowledge whenever you want.
+</p>
+
+</div>
+
+
+</div>
+
+</main>
+
+
+<!-- Supabase -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase-config.js"></script>
+
+
+<script>
+
+async function loadDashboard() {
+
+  const loading =
+    document.getElementById("loading");
+
+  const dashboardContent =
+    document.getElementById("dashboardContent");
+
+  const createAI =
+    document.getElementById("createAI");
+
+  const myAI =
+    document.getElementById("myAI");
+
+  const errorBox =
+    document.getElementById("error");
+
+
+  try {
+
+    /*
+    ========================================
+    GET CURRENT LOGIN SESSION
+    ========================================
+    */
+
+    const {
+      data: {
+        session
+      },
+      error: sessionError
+    } =
+      await supabaseClient.auth.getSession();
+
+
+    if (sessionError) {
+      throw sessionError;
+    }
+
+
+    if (!session) {
+
+      window.location.href =
+        "login.html";
+
+      return;
+
+    }
+
+
+    const user =
+      session.user;
+
+
+    /*
+    ========================================
+    USER INFORMATION
+    ========================================
+    */
+
+    const metadata =
+      user.user_metadata || {};
+
+
+    const name =
+      metadata.name ||
+      user.email ||
+      "there";
+
+
+    document.getElementById(
+      "welcome"
+    ).textContent =
+      `Welcome, ${name} 👋`;
+
+
+    /*
+    ========================================
+    CHECK SUPABASE AGENTS TABLE
+    ========================================
+    */
+
+    const {
+      data: agent,
+      error: agentError
+    } =
+      await supabaseClient
+        .from("agents")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+
+    if (agentError) {
+
+      console.error(
+        "Agent query error:",
+        agentError
+      );
+
+      throw new Error(
+        "Could not check your existing AI agent. " +
+        agentError.message
+      );
+
+    }
+
+
+    /*
+    ========================================
+    AGENT EXISTS
+    ========================================
+    */
+
+    if (agent) {
+
+      console.log(
+        "ShopBrain agent found:",
+        agent
+      );
+
+
+      createAI.style.display =
+        "none";
+
+      myAI.style.display =
+        "block";
+
+
+      document.getElementById(
+        "agentName"
+      ).textContent =
+        agent.agent_name ||
+        "ShopBrain Assistant";
+
+
+      document.getElementById(
+        "businessName"
+      ).textContent =
+        agent.business_name ||
+        "Your Business";
+
+
+    }
+
+
+    /*
+    ========================================
+    NO AGENT
+    ========================================
+    */
+
+    else {
+
+      console.log(
+        "No ShopBrain agent found."
+      );
+
+
+      createAI.style.display =
+        "block";
+
+      myAI.style.display =
+        "none";
+
+    }
+
+
+    /*
+    ========================================
+    SHOW DASHBOARD
+    ========================================
+    */
+
+    loading.style.display =
+      "none";
+
+    dashboardContent.style.display =
+      "block";
+
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Dashboard error:",
+      error
+    );
+
+
+    loading.style.display =
+      "none";
+
+    errorBox.textContent =
+      error.message ||
+      "Unable to load your dashboard.";
+
+    errorBox.style.display =
+      "block";
+
+    dashboardContent.style.display =
+      "block";
+
+  }
+
+}
+
+
+/*
+========================================
+LOGOUT
+========================================
+*/
+
+document
+  .getElementById("logoutButton")
+  .addEventListener(
+    "click",
+    async function() {
+
+      try {
+
+        await supabaseClient.auth.signOut();
+
+        window.location.href =
+          "login.html";
+
+      }
+
+      catch (error) {
+
+        console.error(
+          "Logout error:",
+          error
+        );
+
+      }
+
+    }
+  );
+
+
+/*
+========================================
+START
+========================================
+*/
+
+loadDashboard();
+
+</script>
+
+</body>
+</html>
