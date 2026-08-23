@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Test AI - ShopBrain</title>
+
+<style>
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+}
+
+.header {
+  background: #111827;
+  color: white;
+  padding: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logo span {
+  color: #3b82f6;
+}
+
+.back {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.chat {
+  max-width: 750px;
+  margin: 30px auto;
+  background: white;
+  height: 80vh;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 25px rgba(0,0,0,.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  padding: 20px;
+  border-bottom: 1px solid #eee;
+}
+
+.chat-header h2 {
+  margin: 0 0 5px;
+}
+
+.chat-header p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.status {
+  font-size: 13px;
+  color: #16a34a;
+  margin-top: 7px;
+}
+
+.messages {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.message {
+  display: flex;
+  margin-bottom: 15px;
+}
+
+.message.user {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 80%;
+  padding: 13px 16px;
+  border-radius: 15px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.ai .bubble {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+.user .bubble {
+  background: #2563eb;
+  color: white;
+}
+
+.typing .bubble {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.input-area {
+  display: flex;
+  gap: 10px;
+  padding: 15px;
+  border-top: 1px solid #eee;
+}
+
+input {
+  flex: 1;
+  padding: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  font-size: 15px;
+}
+
+button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 9px;
+  padding: 0 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+@media (max-width: 600px) {
+
+  .chat {
+    margin: 0;
+    width: 100%;
+    height: calc(100vh - 64px);
+    border-radius: 0;
+  }
+
+  .bubble {
+    max-width: 88%;
+  }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+  <div class="logo">
+    Shop<span>Brain</span>
+  </div>
+
+  <a
+    href="dashboard.html"
+    class="back"
+  >
+    ← Dashboard
+  </a>
+
+</div>
+
+
+<div class="chat">
+
+  <div class="chat-header">
+
+    <h2 id="agentName">
+      ShopBrain AI
+    </h2>
+
+    <p id="businessName">
+      Customer Service Assistant
+    </p>
+
+    <div
+      class="status"
+      id="status"
+    >
+      ● Loading AI...
+    </div>
+
+  </div>
+
+
+  <div
+    class="messages"
+    id="messages"
+  ></div>
+
+
+  <div class="input-area">
+
+    <input
+      id="userInput"
+      type="text"
+      placeholder="Ask your AI..."
+      autocomplete="off"
+    >
+
+    <button
+      id="sendButton"
+      type="button"
+    >
+      Send
+    </button>
+
+  </div>
+
+</div>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase-config.js"></script>
+
+
+<script>
+
+let currentAgent = null;
+let currentKnowledge = [];
+
+
+const messages =
+  document.getElementById("messages");
+
+const input =
+  document.getElementById("userInput");
+
+const sendButton =
+  document.getElementById("sendButton");
+
+const agentName =
+  document.getElementById("agentName");
+
+const businessName =
+  document.getElementById("businessName");
+
+const status =
+  document.getElementById("status");
+
+
+function addMessage(text, type) {
+
+  const row =
+    document.createElement("div");
+
+  row.className =
+    "message " + type;
+
+  const bubble =
+    document.createElement("div");
+
+  bubble.className =
+    "bubble";
+
+  bubble.textContent =
+    text;
+
+  row.appendChild(bubble);
+
+  messages.appendChild(row);
+
+  messages.scrollTop =
+    messages.scrollHeight;
+
+}
+
+
+function showTyping() {
+
+  const row =
+    document.createElement("div");
+
+  row.className =
+    "message ai typing";
+
+  row.id =
+    "typingMessage";
+
+  const bubble =
+    document.createElement("div");
+
+  bubble.className =
+    "bubble";
+
+  bubble.textContent =
+    "ShopBrain AI is thinking...";
+
+  row.appendChild(bubble);
+
+  messages.appendChild(row);
+
+  messages.scrollTop =
+    messages.scrollHeight;
+
+}
+
+
+function removeTyping() {
+
+  const typing =
+    document.getElementById(
+      "typingMessage"
+    );
+
+  if (typing) {
+    typing.remove();
+  }
+
+}
+
+
+/*
+========================================
+LOAD AGENT
+========================================
+*/
+
+async function loadAgent() {
+
+  try {
+
+    status.textContent =
+      "● Checking account...";
+
+
+    const {
+      data: {
+        user
+      },
+      error: userError
+    } =
+      await supabaseClient.auth.getUser();
+
+
+    if (userError) {
+      throw userError;
+    }
+
+
+    if (!user) {
+
+      window.location.href =
+        "login.html";
+
+      return;
+
+    }
+
+
+    /*
+    Get agent
+    */
+
+    const {
+      data: agent,
+      error: agentError
+    } =
+      await supabaseClient
+        .from("agents")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+
+    if (agentError) {
+      throw agentError;
+    }
+
+
+    if (!agent) {
+
+      status.textContent =
+        "● No AI agent found";
+
+      addMessage(
+        "You haven't created an AI agent yet. Go back to the dashboard and create one.",
+        "ai"
+      );
+
+      sendButton.disabled = true;
+      input.disabled = true;
+
+      return;
+
+    }
+
+
+    currentAgent =
+      agent;
+
+
+    /*
+    Get training knowledge
+    */
+
+    const {
+      data: knowledge,
+      error: knowledgeError
+    } =
+      await supabaseClient
+        .from("knowledge")
+        .select("*")
+        .eq("agent_id", agent.id)
+        .order("created_at", {
+          ascending: true
+        });
+
+
+    if (knowledgeError) {
+
+      console.warn(
+        "Knowledge loading warning:",
+        knowledgeError
+      );
+
+      currentKnowledge = [];
+
+    } else {
+
+      currentKnowledge =
+        knowledge || [];
+
+    }
+
+
+    /*
+    Display agent
+    */
+
+    agentName.textContent =
+      agent.agent_name ||
+      "ShopBrain AI";
+
+    businessName.textContent =
+      agent.business_name ||
+      "Customer Service Assistant";
+
+
+    status.textContent =
+      "● AI ready";
+
+
+    addMessage(
+      agent.welcome_message ||
+      "Hi! 👋 How can I help you today?",
+      "ai"
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Agent loading error:",
+      error
+    );
+
+    status.textContent =
+      "● Connection error";
+
+    addMessage(
+      "Could not load your AI agent.\n\n" +
+      error.message,
+      "ai"
+    );
+
+    sendButton.disabled = true;
+
+  }
+
+}
+
+
+/*
+========================================
+ASK SHOPBRAIN EDGE FUNCTION
+========================================
+*/
+
+async function askAI(question) {
+
+  if (!currentAgent) {
+
+    throw new Error(
+      "Your AI agent has not loaded yet."
+    );
+
+  }
+
+
+  const {
+    data: {
+      session
+    }
+  } =
+    await supabaseClient.auth.getSession();
+
+
+  if (!session) {
+
+    throw new Error(
+      "Your login session has expired. Please log in again."
+    );
+
+  }
+
+
+  /*
+  Convert knowledge into text
+  */
+
+  const knowledgeText =
+    currentKnowledge
+      .map(function(item) {
+
+        return (
+          "Category: " +
+          item.type +
+          "\nTitle: " +
+          (item.title || "") +
+          "\nInformation: " +
+          (item.content || "")
+        );
+
+      })
+      .join("\n\n");
+
+
+  /*
+  Call Edge Function
+  */
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient.functions.invoke(
+      "shopbrain-chat",
+      {
+        body: {
+
+          agent_id:
+            currentAgent.id,
+
+          message:
+            question,
+
+          knowledge:
+            knowledgeText,
+
+          business_name:
+            currentAgent.business_name,
+
+          agent_name:
+            currentAgent.agent_name
+
+        }
+      }
+    );
+
+
+  if (error) {
+
+    console.error(
+      "ShopBrain Edge Function error:",
+      error
+    );
+
+    throw new Error(
+      error.message ||
+      "The ShopBrain AI function failed."
+    );
+
+  }
+
+
+  if (!data) {
+
+    throw new Error(
+      "No response came back from ShopBrain AI."
+    );
+
+  }
+
+
+  if (data.error) {
+
+    throw new Error(
+      data.error
+    );
+
+  }
+
+
+  if (!data.answer) {
+
+    console.error(
+      "Unexpected Edge Function response:",
+      data
+    );
+
+    throw new Error(
+      "The AI function did not return an 'answer'."
+    );
+
+  }
+
+
+  return data.answer;
+
+}
+
+
+/*
+========================================
+SEND MESSAGE
+========================================
+*/
+
+async function sendMessage() {
+
+  const question =
+    input.value.trim();
+
+
+  if (!question) {
+    return;
+  }
+
+
+  sendButton.disabled = true;
+  input.disabled = true;
+
+
+  addMessage(
+    question,
+    "user"
+  );
+
+
+  input.value = "";
+
+  showTyping();
+
+
+  try {
+
+    const answer =
+      await askAI(question);
+
+
+    removeTyping();
+
+
+    addMessage(
+      answer,
+      "ai"
+    );
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Chat error:",
+      error
+    );
+
+
+    removeTyping();
+
+
+    addMessage(
+      "Sorry, I couldn't get a response from your AI.\n\n" +
+      error.message,
+      "ai"
+    );
+
+  }
+
+
+  sendButton.disabled = false;
+  input.disabled = false;
+
+  input.focus();
+
+}
+
+
+/*
+========================================
+EVENTS
+========================================
+*/
+
+sendButton.addEventListener(
+  "click",
+  sendMessage
+);
+
+
+input.addEventListener(
+  "keydown",
+  function(event) {
+
+    if (event.key === "Enter") {
+
+      event.preventDefault();
+
+      sendMessage();
+
+    }
+
+  }
+);
+
+
+/*
+========================================
+START
+========================================
+*/
+
+loadAgent();
+
+</script>
+
+</body>
+</html>
