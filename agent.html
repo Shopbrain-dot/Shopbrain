@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Create AI Agent - ShopBrain</title>
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f7fb;
+  color: #111827;
+}
+
+header {
+  background: #111827;
+  color: white;
+  padding: 18px;
+}
+
+.header {
+  max-width: 900px;
+  margin: auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+.logo span {
+  color: #3b82f6;
+}
+
+.back {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.container {
+  max-width: 720px;
+  margin: 40px auto;
+  padding: 20px;
+}
+
+.card {
+  background: white;
+  padding: 30px;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.07);
+}
+
+h1 {
+  margin-top: 0;
+  font-size: 28px;
+}
+
+.subtitle {
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 25px;
+}
+
+label {
+  display: block;
+  font-weight: bold;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 15px;
+  font-family: Arial, sans-serif;
+}
+
+textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+input:focus,
+textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+}
+
+button {
+  width: 100%;
+  margin-top: 28px;
+  padding: 15px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1d4ed8;
+}
+
+button:disabled {
+  background: #9ca3af;
+  cursor: not-allowed;
+}
+
+.message {
+  display: none;
+  padding: 14px;
+  margin-bottom: 20px;
+  border-radius: 10px;
+  line-height: 1.5;
+}
+
+.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.info {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.section-title {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+  font-size: 18px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+  <div class="header">
+
+    <div class="logo">
+      Shop<span>Brain</span>
+    </div>
+
+    <a
+      href="dashboard.html"
+      class="back"
+    >
+      ← Dashboard
+    </a>
+
+  </div>
+
+</header>
+
+
+<main class="container">
+
+  <div class="card">
+
+    <h1>🤖 Create Your AI Agent</h1>
+
+    <p class="subtitle">
+      Create your ShopBrain customer-service AI.
+      Add your business information and teach your AI
+      how to help your customers.
+    </p>
+
+
+    <div
+      id="loadingMessage"
+      class="message info"
+    >
+      Loading your account...
+    </div>
+
+
+    <div
+      id="infoMessage"
+      class="message info"
+    ></div>
+
+
+    <div
+      id="errorMessage"
+      class="message error"
+    ></div>
+
+
+    <div
+      id="successMessage"
+      class="message success"
+    ></div>
+
+
+    <form
+      id="agentForm"
+      class="hidden"
+    >
+
+      <label for="agentName">
+        AI Agent Name
+      </label>
+
+      <input
+        id="agentName"
+        type="text"
+        placeholder="Example: Shop Assistant"
+        required
+      >
+
+
+      <label for="businessName">
+        Business Name
+      </label>
+
+      <input
+        id="businessName"
+        type="text"
+        placeholder="Example: Shopora Market Hub"
+        required
+      >
+
+
+      <label for="businessDescription">
+        About Your Business
+      </label>
+
+      <textarea
+        id="businessDescription"
+        placeholder="Example:
+
+We sell gadgets and electronics.
+We deliver worldwide.
+Customers can contact us for support."
+      ></textarea>
+
+
+      <h2 class="section-title">
+        📦 Products & Services
+      </h2>
+
+      <textarea
+        id="products"
+        placeholder="Example:
+
+Wireless Earbuds - $29
+Smart Watch - $49
+Phone Cases - $15"
+      ></textarea>
+
+
+      <h2 class="section-title">
+        🚚 Shipping Information
+      </h2>
+
+      <textarea
+        id="shipping"
+        placeholder="Example:
+
+We deliver worldwide.
+Delivery takes 3-5 business days."
+      ></textarea>
+
+
+      <h2 class="section-title">
+        🔄 Refund & Return Policy
+      </h2>
+
+      <textarea
+        id="refund"
+        placeholder="Example:
+
+Customers can return unused products within 14 days."
+      ></textarea>
+
+
+      <h2 class="section-title">
+        ❓ Frequently Asked Questions
+      </h2>
+
+      <textarea
+        id="faqs"
+        placeholder="Example:
+
+Q: Do you deliver internationally?
+A: Yes, we deliver worldwide."
+      ></textarea>
+
+
+      <button
+        type="submit"
+        id="createButton"
+      >
+        🚀 Create AI Agent
+      </button>
+
+    </form>
+
+  </div>
+
+</main>
+
+
+<script type="module">
+
+/*
+==================================================
+FIREBASE
+==================================================
+*/
+
+import { db } from "./firebase-config.js";
+
+import {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+
+/*
+==================================================
+ELEMENTS
+==================================================
+*/
+
+const form =
+  document.getElementById("agentForm");
+
+const loadingMessage =
+  document.getElementById("loadingMessage");
+
+const infoMessage =
+  document.getElementById("infoMessage");
+
+const errorMessage =
+  document.getElementById("errorMessage");
+
+const successMessage =
+  document.getElementById("successMessage");
+
+const createButton =
+  document.getElementById("createButton");
+
+
+/*
+==================================================
+MESSAGE FUNCTIONS
+==================================================
+*/
+
+function hideMessages() {
+
+  loadingMessage.style.display = "none";
+  infoMessage.style.display = "none";
+  errorMessage.style.display = "none";
+  successMessage.style.display = "none";
+
+}
+
+
+function showError(message) {
+
+  hideMessages();
+
+  errorMessage.textContent = message;
+
+  errorMessage.style.display = "block";
+
+}
+
+
+function showInfo(message) {
+
+  hideMessages();
+
+  infoMessage.textContent = message;
+
+  infoMessage.style.display = "block";
+
+}
+
+
+function showSuccess(message) {
+
+  hideMessages();
+
+  successMessage.textContent = message;
+
+  successMessage.style.display = "block";
+
+}
+
+
+/*
+==================================================
+GET CURRENT USER
+
+IMPORTANT:
+We use shopbrainUser first.
+
+This matches your existing login system.
+==================================================
+*/
+
+function getCurrentUser() {
+
+  const savedUser =
+    localStorage.getItem(
+      "shopbrainUser"
+    );
+
+
+  if (!savedUser) {
+
+    return null;
+
+  }
+
+
+  try {
+
+    const user =
+      JSON.parse(savedUser);
+
+
+    if (!user) {
+
+      return null;
+
+    }
+
+
+    /*
+    Your existing signup/login may use
+    email but not an ID.
+
+    Therefore we create a stable ID
+    from the email when necessary.
+    */
+
+    const email =
+      user.email || "";
+
+
+    const userId =
+      user.id ||
+      email.toLowerCase().trim();
+
+
+    if (!userId) {
+
+      return null;
+
+    }
+
+
+    return {
+
+      id: String(userId),
+
+      email: email,
+
+      name:
+        user.name || ""
+
+    };
+
+
+  } catch (error) {
+
+    console.error(
+      "Could not read shopbrainUser:",
+      error
+    );
+
+    return null;
+
+  }
+
+}
+
+
+/*
+==================================================
+CHECK LOGIN
+==================================================
+*/
+
+const currentUser =
+  getCurrentUser();
+
+
+if (!currentUser) {
+
+  hideMessages();
+
+  showError(
+    "You are not logged in. Please log in first."
+  );
+
+
+  /*
+  Give the message a moment to show,
+  then go to login.
+  */
+
+  setTimeout(
+    function() {
+
+      window.location.href =
+        "login.html";
+
+    },
+    1500
+  );
+
+
+} else {
+
+  checkExistingAgent();
+
+}
+
+
+/*
+==================================================
+CHECK EXISTING AGENT
+==================================================
+*/
+
+async function checkExistingAgent() {
+
+  try {
+
+    loadingMessage.style.display =
+      "block";
+
+
+    const agentsRef =
+      collection(
+        db,
+        "agents"
+      );
+
+
+    const agentQuery =
+      query(
+        agentsRef,
+        where(
+          "userId",
+          "==",
+          currentUser.id
+        )
+      );
+
+
+    const snapshot =
+      await getDocs(
+        agentQuery
+      );
+
+
+    loadingMessage.style.display =
+      "none";
+
+
+    if (!snapshot.empty) {
+
+      showInfo(
+        "You already have an AI agent. Each ShopBrain account can have one AI agent."
+      );
+
+
+      /*
+      Show a button to return
+      to the dashboard.
+      */
+
+      const dashboardButton =
+        document.createElement("a");
+
+
+      dashboardButton.href =
+        "dashboard.html";
+
+      dashboardButton.textContent =
+        "← Go to Dashboard";
+
+      dashboardButton.style.display =
+        "block";
+
+      dashboardButton.style.textAlign =
+        "center";
+
+      dashboardButton.style.marginTop =
+        "15px";
+
+      dashboardButton.style.padding =
+        "14px";
+
+      dashboardButton.style.background =
+        "#111827";
+
+      dashboardButton.style.color =
+        "white";
+
+      dashboardButton.style.borderRadius =
+        "10px";
+
+      dashboardButton.style.textDecoration =
+        "none";
+
+      dashboardButton.style.fontWeight =
+        "bold";
+
+
+      form.parentNode.appendChild(
+        dashboardButton
+      );
+
+
+      return;
+
+    }
+
+
+    /*
+    No agent yet.
+    */
+
+    form.classList.remove(
+      "hidden"
+    );
+
+
+    hideMessages();
+
+
+  } catch (error) {
+
+    console.error(
+      "Firestore check error:",
+      error
+    );
+
+
+    showError(
+      "Could not check your existing AI agent. Make sure your Firebase Firestore database is enabled and that the agents collection exists."
+    );
+
+  }
+
+}
+
+
+/*
+==================================================
+CREATE AI AGENT
+==================================================
+*/
+
+form.addEventListener(
+  "submit",
+  async function(event) {
+
+    event.preventDefault();
+
+
+    /*
+    Double-check user.
+    */
+
+    const user =
+      getCurrentUser();
+
+
+    if (!user) {
+
+      showError(
+        "Your login information could not be found. Please log in again."
+      );
+
+      return;
+
+    }
+
+
+    /*
+    Get form values.
+    */
+
+    const agentName =
+      document
+        .getElementById("agentName")
+        .value
+        .trim();
+
+
+    const businessName =
+      document
+        .getElementById("businessName")
+        .value
+        .trim();
+
+
+    const businessDescription =
+      document
+        .getElementById("businessDescription")
+        .value
+        .trim();
+
+
+    const products =
+      document
+        .getElementById("products")
+        .value
+        .trim();
+
+
+    const shipping =
+      document
+        .getElementById("shipping")
+        .value
+        .trim();
+
+
+    const refund =
+      document
+        .getElementById("refund")
+        .value
+        .trim();
+
+
+    const faqs =
+      document
+        .getElementById("faqs")
+        .value
+        .trim();
+
+
+    /*
+    Validate required fields.
+    */
+
+    if (!agentName) {
+
+      showError(
+        "Please enter your AI agent name."
+      );
+
+      return;
+
+    }
+
+
+    if (!businessName) {
+
+      showError(
+        "Please enter your business name."
+      );
+
+      return;
+
+    }
+
+
+    /*
+    Disable button.
+    */
+
+    createButton.disabled =
+      true;
+
+    createButton.textContent =
+      "Creating your AI...";
+
+
+    try {
+
+      /*
+      ==============================================
+      CREATE AGENT DOCUMENT
+      ==============================================
+      */
+
+      const agentData = {
+
+        userId:
+          user.id,
+
+        userEmail:
+          user.email,
+
+        userName:
+          user.name,
+
+        name:
+          agentName,
+
+        businessName:
+          businessName,
+
+        businessDescription:
+          businessDescription,
+
+        welcomeMessage:
+          "Hi! How can I help you today?",
+
+        createdAt:
+          serverTimestamp()
+
+      };
+
+
+      const agentRef =
+        await addDoc(
+          collection(
+            db,
+            "agents"
+          ),
+          agentData
+        );
+
+
+      /*
+      ==============================================
+      CREATE KNOWLEDGE DOCUMENTS
+      ==============================================
+      */
+
+      const knowledgeItems = [
+
+        {
+          type: "business",
+          title: "About the Business",
+          content:
+            businessDescription
+        },
+
+        {
+          type: "products",
+          title: "Products and Services",
+          content:
+            products
+        },
+
+        {
+          type: "shipping",
+          title: "Shipping Information",
+          content:
+            shipping
+        },
+
+        {
+          type: "refund",
+          title: "Refund and Return Policy",
+          content:
+            refund
+        },
+
+        {
+          type: "faq",
+          title: "Frequently Asked Questions",
+          content:
+            faqs
+        }
+
+      ];
+
+
+      /*
+      Save each knowledge item.
+      */
+
+      for (
+        const item of knowledgeItems
+      ) {
+
+        /*
+        Don't save empty fields.
+        */
+
+        if (!item.content) {
+
+          continue;
+
+        }
+
+
+        await addDoc(
+          collection(
+            db,
+            "knowledge"
+          ),
+          {
+
+            agentId:
+              agentRef.id,
+
+            userId:
+              user.id,
+
+            type:
+              item.type,
+
+            title:
+              item.title,
+
+            content:
+              item.content,
+
+            createdAt:
+              serverTimestamp()
+
+          }
+        );
+
+      }
+
+
+      /*
+      ==============================================
+      SAVE COMPATIBILITY DATA
+      ==============================================
+      */
+
+      localStorage.setItem(
+        "shopbrainAgent",
+        JSON.stringify({
+
+          id:
+            agentRef.id,
+
+          agentName:
+            agentName,
+
+          businessName:
+            businessName,
+
+          createdAt:
+            new Date().toISOString()
+
+        })
+      );
+
+
+      /*
+      ==============================================
+      SUCCESS
+      ==============================================
+      */
+
+      form.classList.add(
+        "hidden"
+      );
+
+
+      showSuccess(
+        "✅ Your AI agent was created successfully! Taking you to your dashboard..."
+      );
+
+
+      /*
+      Redirect.
+      */
+
+      setTimeout(
+        function() {
+
+          window.location.href =
+            "dashboard.html";
+
+        },
+        1500
+      );
+
+
+    } catch (error) {
+
+      console.error(
+        "Firebase create agent error:",
+        error
+      );
+
+
+      /*
+      Show the real Firebase error
+      while we're testing.
+      */
+
+      showError(
+        "Firebase error: " +
+        (error.message ||
+        "Could not create your AI agent.")
+      );
+
+
+      createButton.disabled =
+        false;
+
+      createButton.textContent =
+        "🚀 Create AI Agent";
+
+    }
+
+  }
+);
+
+</script>
+
+</body>
+</html>
