@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Create AI Agent - ShopBrain</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f5f7fb;
+      color: #111827;
+    }
+
+    header {
+      background: #111827;
+      color: white;
+      padding: 18px;
+    }
+
+    .header {
+      max-width: 900px;
+      margin: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .logo span {
+      color: #3b82f6;
+    }
+
+    .back {
+      color: white;
+      text-decoration: none;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.08);
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 20px;
+      margin-bottom: 8px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #d1d5db;
+      border-radius: 9px;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 15px;
+      border: none;
+      border-radius: 9px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #9ca3af;
+    }
+
+    .message {
+      margin-bottom: 20px;
+      padding: 14px;
+      border-radius: 9px;
+      display: none;
+      line-height: 1.5;
+    }
+
+    .info {
+      display: block;
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .success {
+      background: #dcfce7;
+      color: #166534;
+    }
+
+    .error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .existing {
+      background: #f3f4f6;
+      padding: 20px;
+      border-radius: 10px;
+      display: none;
+    }
+
+    .link {
+      display: inline-block;
+      margin-top: 15px;
+      padding: 12px 16px;
+      background: #111827;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="header">
+
+    <div class="logo">
+      Shop<span>Brain</span>
+    </div>
+
+    <a href="dashboard.html" class="back">
+      ← Dashboard
+    </a>
+
+  </div>
+</header>
+
+
+<div class="container">
+
+  <div class="card">
+
+    <h1>🤖 Create Your AI Agent</h1>
+
+    <p>
+      Create your ShopBrain customer-service AI.
+    </p>
+
+
+    <div id="message" class="message info">
+      Loading ShopBrain...
+    </div>
+
+
+    <div id="existing" class="existing">
+
+      <h2>🤖 You already have an AI</h2>
+
+      <p id="existingName"></p>
+
+      <a href="dashboard.html" class="link">
+        Go to Dashboard
+      </a>
+
+    </div>
+
+
+    <form id="agentForm" style="display:none;">
+
+      <label for="agentName">
+        AI Agent Name
+      </label>
+
+      <input
+        id="agentName"
+        type="text"
+        placeholder="ShopBrain Assistant"
+        required
+      >
+
+
+      <label for="businessName">
+        Business Name
+      </label>
+
+      <input
+        id="businessName"
+        type="text"
+        placeholder="Your Business"
+        required
+      >
+
+
+      <label for="description">
+        Business Description
+      </label>
+
+      <textarea
+        id="description"
+        placeholder="Tell your AI about your business..."
+      ></textarea>
+
+
+      <label for="welcome">
+        Welcome Message
+      </label>
+
+      <textarea
+        id="welcome"
+      >Hi! 👋 How can I help you today?</textarea>
+
+
+      <button
+        id="createButton"
+        type="submit"
+      >
+        Create AI Agent
+      </button>
+
+    </form>
+
+  </div>
+
+</div>
+
+
+<!-- SUPABASE MUST LOAD FIRST -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="supabase-config.js"></script>
+
+
+<script>
+
+const message =
+  document.getElementById("message");
+
+const form =
+  document.getElementById("agentForm");
+
+const existing =
+  document.getElementById("existing");
+
+const existingName =
+  document.getElementById("existingName");
+
+const createButton =
+  document.getElementById("createButton");
+
+
+function showError(text) {
+
+  message.className =
+    "message error";
+
+  message.textContent =
+    text;
+
+  message.style.display =
+    "block";
+}
+
+
+function showSuccess(text) {
+
+  message.className =
+    "message success";
+
+  message.textContent =
+    text;
+
+  message.style.display =
+    "block";
+}
+
+
+async function start() {
+
+  try {
+
+    /*
+      Check Supabase client
+    */
+
+    if (
+      typeof supabaseClient ===
+      "undefined"
+    ) {
+
+      throw new Error(
+        "supabaseClient is not defined. Check supabase-config.js."
+      );
+
+    }
+
+
+    message.textContent =
+      "Checking your login...";
+
+
+    /*
+      Get logged-in user
+    */
+
+    const {
+      data: {
+        user
+      },
+      error: userError
+    } =
+      await supabaseClient.auth.getUser();
+
+
+    if (userError) {
+      throw userError;
+    }
+
+
+    if (!user) {
+
+      window.location.href =
+        "login.html";
+
+      return;
+    }
+
+
+    message.textContent =
+      "Checking your existing AI agent...";
+
+
+    /*
+      Look for existing agent
+    */
+
+    const {
+      data: agent,
+      error: agentError
+    } =
+      await supabaseClient
+        .from("agents")
+        .select("*")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+
+    if (agentError) {
+      throw agentError;
+    }
+
+
+    /*
+      Agent already exists
+    */
+
+    if (agent) {
+
+      message.style.display =
+        "none";
+
+      existing.style.display =
+        "block";
+
+      existingName.textContent =
+        "Agent: " +
+        (agent.agent_name ||
+         "ShopBrain AI");
+
+      return;
+    }
+
+
+    /*
+      No agent yet
+    */
+
+    message.style.display =
+      "none";
+
+    form.style.display =
+      "block";
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Agent page error:",
+      error
+    );
+
+    showError(
+      "Error: " +
+      (
+        error.message ||
+        "Something went wrong."
+      )
+    );
+
+  }
+
+}
+
+
+/*
+CREATE AGENT
+*/
+
+form.addEventListener(
+  "submit",
+  async function(event) {
+
+    event.preventDefault();
+
+
+    createButton.disabled =
+      true;
+
+    createButton.textContent =
+      "Creating...";
+
+
+    try {
+
+      const {
+        data: {
+          user
+        },
+        error: userError
+      } =
+        await supabaseClient.auth.getUser();
+
+
+      if (userError) {
+        throw userError;
+      }
+
+
+      if (!user) {
+
+        throw new Error(
+          "You are not logged in."
+        );
+
+      }
+
+
+      const agentName =
+        document
+          .getElementById("agentName")
+          .value
+          .trim();
+
+      const businessName =
+        document
+          .getElementById("businessName")
+          .value
+          .trim();
+
+      const description =
+        document
+          .getElementById("description")
+          .value
+          .trim();
+
+      const welcome =
+        document
+          .getElementById("welcome")
+          .value
+          .trim();
+
+
+      const {
+        data,
+        error
+      } =
+        await supabaseClient
+          .from("agents")
+          .insert({
+
+            user_id:
+              user.id,
+
+            agent_name:
+              agentName,
+
+            business_name:
+              businessName,
+
+            business_description:
+              description || null,
+
+            welcome_message:
+              welcome ||
+              "Hi! 👋 How can I help you today?"
+
+          })
+          .select()
+          .single();
+
+
+      if (error) {
+        throw error;
+      }
+
+
+      console.log(
+        "Created agent:",
+        data
+      );
+
+
+      showSuccess(
+        "🎉 Your AI agent was created successfully!"
+      );
+
+
+      setTimeout(
+        function() {
+
+          window.location.href =
+            "train.html";
+
+        },
+        1000
+      );
+
+    }
+
+    catch (error) {
+
+      console.error(
+        "Create agent error:",
+        error
+      );
+
+      showError(
+        "Create agent error: " +
+        (
+          error.message ||
+          "Unknown error"
+        )
+      );
+
+
+      createButton.disabled =
+        false;
+
+      createButton.textContent =
+        "Create AI Agent";
+
+    }
+
+  });
+
+
+start();
+
+</script>
+
+</body>
+</html>
