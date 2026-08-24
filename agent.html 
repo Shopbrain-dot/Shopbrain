@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ShopBrain - Create Agent</title>
+</head>
+<body>
+  <h1>Create Your AI Agent</h1>
+  <form id="agent-form">
+    <input type="text" id="agentName" placeholder="Agent Name" required />
+    <input type="text" id="businessName" placeholder="Business Name" required />
+    <textarea id="businessDescription" placeholder="Business Description" required></textarea>
+    <textarea id="welcomeMessage" placeholder="Welcome Message" required></textarea>
+    <button type="submit">Create Agent</button>
+  </form>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script type="module" src="supabase-config.js"></script>
+  <script type="module">
+    import { supabaseClient } from "./supabase-config.js";
+
+    // Check authentication
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser();
+    if (userError || !user) {
+      window.location.href = "login.html";
+    }
+
+    const form = document.getElementById("agent-form");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const agentName = document.getElementById("agentName").value.trim();
+      const businessName = document.getElementById("businessName").value.trim();
+      const businessDescription = document.getElementById("businessDescription").value.trim();
+      const welcomeMessage = document.getElementById("welcomeMessage").value.trim();
+
+      if (!agentName || !businessName || !businessDescription || !welcomeMessage) {
+        alert("All fields are required.");
+        return;
+      }
